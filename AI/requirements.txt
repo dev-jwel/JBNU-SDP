@@ -1,0 +1,5 @@
+fire
+flask
+flask-restx
+numpy
+torch

@@ -1,0 +1,14 @@
+# hidden mac file
+.DS_Store
+
+# venv files
+bin/
+lib/
+share/
+pyvenv.cfg
+
+# pycache
+__pycache__/
+
+# log file for flask
+log.txt
