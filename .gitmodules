@@ -1,0 +1,3 @@
+[submodule "alpha-zero-general"]
+	path = AI/alpha-zero-general
+	url = https://github.com/dev-jwel/alpha-zero-general.git
