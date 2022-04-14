@@ -1,4 +1,0 @@
-[submodule "AI/src/chess-alpha-zero"]
-	path = AI/src/chess-alpha-zero
-	url = https://github.com/dev-jwel/chess-alpha-zero.git
-	branch = losing-AI
