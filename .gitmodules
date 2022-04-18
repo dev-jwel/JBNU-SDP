@@ -1,0 +1,4 @@
+[submodule "AI/src/alpha-zero-general"]
+	path = AI/src/alpha-zero-general
+	url = https://github.com/dev-jwel/alpha-zero-general.git
+	branch = JBNU-SDP
