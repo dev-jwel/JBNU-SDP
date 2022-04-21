@@ -10,7 +10,7 @@ from utils import *
 from chess_mod.ChessGame import ChessGame as Game
 from chess_mod.pytorch.NNet import NNetWrapper as nn
 
-os.chdir('../../..')
+os.chdir('../..')
 
 log = logging.getLogger(__name__)
 

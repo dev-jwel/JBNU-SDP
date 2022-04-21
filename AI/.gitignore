@@ -12,3 +12,6 @@ __pycache__/
 
 # log file for flask
 log.txt
+
+# model parameter
+temp/
