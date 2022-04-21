@@ -4,3 +4,5 @@ flask
 flask-restx
 numpy
 torch
+coloredlogs
+tqdm
