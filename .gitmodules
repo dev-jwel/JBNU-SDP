@@ -1,4 +1,4 @@
-[submodule "AI/src/alpha-zero-general"]
-	path = AI/src/alpha-zero-general
-	url = https://github.com/dev-jwel/alpha-zero-general.git
+[submodule "AI/src/chess-alpha-zero"]
+	path = AI/src/chess-alpha-zero
+	url = https://github.com/dev-jwel/chess-alpha-zero.git
 	branch = JBNU-SDP

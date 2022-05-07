@@ -1,12 +1,25 @@
 import chess
 import random
 from fire import Fire
-from flask import Flask, request, abort
+from flask import Flask, request, abort, current_app
 from flask_restx import Api, Resource
-from UCI import ALL_LABELS
+
+from threading import Lock
+from chess_zero.agent.player_chess import ChessPlayer
+from chess_zero.agent.player_chess import GentleChessPlayer
+from chess_zero.config import Config, PlayWithHumanConfig
+from chess_zero.env.chess_env import ChessEnv
+from chess_zero.agent.model_chess import ChessModel
+from chess_zero.lib.model_helper import load_best_model_weight
+from chess_zero.lib.logger import setup_logger
 
 MODES = ['easy', 'hard']
 MAX_LEVEL = 32
+
+config = Config(config_type='normal')
+config.resource.create_directories()
+setup_logger(config.resource.main_log_path)
+PlayWithHumanConfig().update_play_config(config.play)
 
 app = Flask(__name__)
 api = Api(app)
@@ -14,33 +27,62 @@ api = Api(app)
 @api.route('/<string:mode>/<int:level>')
 class AI_REST_API(Resource):
 	def post(self, mode, level):
-		history = request.json
+		# get request
+		req = request.json
+
+		# initialize the app if not initialized
+		if not getattr(current_app, 'initialized', False):
+			current_app.pipe_lock = Lock()
+			current_app.reserved_pipe_pools = []
+			current_app.model_lock = Lock()
+			current_app.model = ChessModel(config)
+			if not load_best_model_weight(current_app.model):
+				raise RuntimeError('Best model not found!')
+			current_app.initialized = True
+
+		pipe_lock = current_app.pipe_lock
+		reserved_pipe_pools = current_app.reserved_pipe_pools
+		model_lock = current_app.model_lock
+		model = current_app.model
 
 		if not mode in MODES:
 			return abort(400, 'wrong mode')
-
 		if not (0 <= level and level < MAX_LEVEL):
 			return abort(400, 'wrong level')
+		if 'fen' not in req:
+			return abort(400, 'there is no fen in the request')
 
-		if not isinstance(history, list):
-			return abort(400, 'wrong request')
+		# create env
+		try:
+			env = ChessEnv()
+			env.update(req['fen'])
+		except:
+			return abort(400, 'wrong fen format')
 
-		board = chess.Board()
+		# get pipe_pool
+		pipe_pool = None
+		with pipe_lock:
+			if len(reserved_pipe_pools) > 0:
+				pipe_pool = reserved_pipe_pools.pop()
+		if pipe_pool is None:
+			with model_lock:
+				pipe_pool = model.get_pipes(config.play.search_threads)
 
-		for move in history:
-			try:
-				move = chess.Move.from_uci(move)
-			except:
-				return abort(400, "wrong history")
-			if move in board.legal_moves:
-				board.push(move)
-			else:
-				return abort(400, "wrong history")
-
-		if board.legal_moves:
-			return random.choice(list(board.legal_moves)).uci()
+		# create player
+		if mode == 'easy':
+			player = GentleChessPlayer(config, pipe_pool)
 		else:
-			return abort(400, "no legal move")
+			player = ChessPlayer(config, pipe_pool)
 
-if __name__ == "__main__":
+		# get action
+		action = player.action(env)
+
+		# move pipe_pool into reserved_pipe_pools
+		with pipe_lock:
+			reserved_pipe_pools.append(pipe_pool)
+
+		# return the action
+		return action
+
+if __name__ == '__main__':
 	Fire(app.run)

@@ -5,6 +5,7 @@
 bin/
 lib/
 share/
+include/
 pyvenv.cfg
 
 # pycache
@@ -12,6 +13,3 @@ __pycache__/
 
 # log file for flask
 log.txt
-
-# model parameter
-temp/
