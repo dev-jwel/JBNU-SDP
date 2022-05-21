@@ -14,7 +14,6 @@ from chess_zero.lib.model_helper import load_best_model_weight
 from chess_zero.lib.logger import setup_logger
 
 MODES = ['easy', 'hard']
-MAX_LEVEL = 32
 
 config = Config(config_type='normal')
 config.resource.create_directories()
@@ -24,21 +23,18 @@ PlayWithHumanConfig().update_play_config(config.play)
 app = Flask(__name__)
 api = Api(app)
 
-@api.route('/<string:mode>/<int:level>')
+app.pipe_lock = Lock()
+app.reserved_pipe_pools = []
+app.model_lock = Lock()
+app.model = ChessModel(config)
+if not load_best_model_weight(app.model):
+	raise RuntimeError('Best model not found!')
+
+@api.route('/<string:mode>')
 class AI_REST_API(Resource):
-	def post(self, mode, level):
+	def post(self, mode):
 		# get request
 		req = request.json
-
-		# initialize the app if not initialized
-		if not getattr(current_app, 'initialized', False):
-			current_app.pipe_lock = Lock()
-			current_app.reserved_pipe_pools = []
-			current_app.model_lock = Lock()
-			current_app.model = ChessModel(config)
-			if not load_best_model_weight(current_app.model):
-				raise RuntimeError('Best model not found!')
-			current_app.initialized = True
 
 		pipe_lock = current_app.pipe_lock
 		reserved_pipe_pools = current_app.reserved_pipe_pools
@@ -47,8 +43,6 @@ class AI_REST_API(Resource):
 
 		if not mode in MODES:
 			return abort(400, 'wrong mode')
-		if not (0 <= level and level < MAX_LEVEL):
-			return abort(400, 'wrong level')
 		if 'fen' not in req:
 			return abort(400, 'there is no fen in the request')
 
