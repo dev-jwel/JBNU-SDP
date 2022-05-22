@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>{% block title %}Welcome to web chess arena!{% endblock %}</title>
+		<link rel="icon" type="image/jpg" href="{{ url_for('static', filename='img/favicon.jpg') }}">
+{% block head %}
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+	</head>
+
+	<body>
+{% block body %}
+		<div style="display: grid; grid-template-columns: 1fr; grid-template-rows: 2fr 7fr 2fr 7fr 2fr; width: 100%; height: 100%;">
+			<div style="grid-column: 1; grid-row: 1;"></div>
+			<div style="text-align: center; grid-column: 1; grid-row: 2;">
+				<button type="button" style="width: 75%; height: 100%;" onclick="location.href='login'"><p style="font-size: 5em;">login</p></button>
+			</div>
+			<div style="grid-column: 1; grid-row: 3;"></div>
+			<div style="text-align: center; grid-column: 1; grid-row: 4;">
+				<button type="button" style="width: 75%; height: 100%;" onclick="location.href='play'"><p style="font-size: 5em;">play now</p></button>
+			</div>
+			<div style="grid-column: 1; grid-row: 5;"></div>
+		</div>
+{% endblock %}
+	</body>
+
+</html>

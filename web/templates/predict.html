@@ -1,0 +1,61 @@
+{% extends "index.html" %}
+
+{% block title %}TEST ONLY{% endblock %}
+
+{% block body %}
+	<form id="predict-form" action="predict" style="width: 100%; height: 100%;" method="POST">
+		<div style="display: grid; grid-template-columns: 1fr; grid-template-rows: 6fr 1fr 6fr 1fr 6fr; width: 100%; height: 100%;">
+			<div style="text-align: center; grid-column: 1; grid-row: 1; width: 100%; height: 100%;">
+				<input style="width: 100%; height: 100%; font-size: 5em" type="text" name="fen" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1">
+			</div>
+
+			<div style="grid-column: 1; grid-row: 2;"></div>
+
+			<div style="text-align: center; grid-column: 1; grid-row: 3; display: grid; grid-template-columns: 1fr 3fr 1fr 3fr; grid-template-rows: 1fr; width: 100%; height: 100%;">
+				<div style="text-align: center; grid-column: 1; grid-row: 1">
+					<input style="width: 100%; height: 100%; font-size: 5em;" id="predict-radio-easy" type="radio" name="mode" value="easy" checked>
+				</div>
+				<div style="text-align: center; grid-column: 2; grid-row: 1">
+					<label style="font-size: 5em;" for="predict-radio-easy">easy</label>
+				</div>
+				<div style="text-align: center; grid-column: 3; grid-row: 1">
+					<input style="width: 100%; height: 100%; font-size: 5em;" id="predict-radio-hard" type="radio" name="mode" value="hard">
+				</div>
+				<div style="text-align: center; grid-column: 4; grid-row: 1">
+					<label style="font-size: 5em;" for="predict-radio-hard">hard</label>
+				</div>
+			</div>
+
+			<div style="grid-column: 1; grid-row: 4;"></div>
+
+			<div style="text-align: center; grid-column: 1; grid-row: 5; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; width: 100%; height: 100%;">
+				<div style="text-align: center; grid-column: 1; grid-row: 1">
+					<button type="button" style="width: 100%; height: 100%;" onclick="request_predict();"><p style="font-size: 5em;">predict</p></button>
+				</div>
+				<div style="text-align: center; grid-column: 2; grid-row: 1">
+					<b id="predict-form-received-action" style="font-size: 5em;"><b>
+				</div>
+			</div>
+
+		</div>
+	</form>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+	<script src="{{ url_for('static', filename='js/play.js') }}" type="module"></script>
+	<script>
+		let request_predict = function() {
+			let mode = document.getElementById('predict-form').elements['mode'].value
+			let fen = document.getElementById('predict-form').elements['fen'].value
+			let action_element = document.getElementById('predict-form-received-action')
+
+			action_element.innerHTML = "requesting..."
+			setTimeout(function() {
+				let action = predict(mode, fen);
+				if (action === null) {
+					action = "wrong fen"
+				}
+				action_element.innerHTML = action
+			}, 10000)
+		}
+	</script>
+{% endblock %}
