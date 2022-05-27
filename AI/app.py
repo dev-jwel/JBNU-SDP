@@ -4,7 +4,8 @@ from fire import Fire
 from flask import Flask, request, abort, current_app
 from flask_restx import Api, Resource
 
-from threading import Thread, Lock
+from multiprocessing import Process
+from threading import Lock
 from chess_zero.agent.player_chess import ChessPlayer
 from chess_zero.agent.player_chess import GentleChessPlayer
 from chess_zero.config import Config, PlayWithHumanConfig
@@ -66,7 +67,7 @@ class AI_REST_API(Resource):
 
 		# get action
 		result = {}
-		player_worker = Thread(target=get_action, args=(player, env, result))
+		player_worker = Process(target=get_action, args=(player, env, result))
 		player_worker.start()
 		player_worker.join()
 		action = result['action']
