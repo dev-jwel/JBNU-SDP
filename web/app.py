@@ -1,9 +1,10 @@
 from fire import Fire
 import os, time, json, chess, string, random, hashlib, sqlite3, requests
 from flask import Flask, request, abort, render_template, redirect, current_app, session
+from typing import List
 
 class DBWraper:
-	def __init__(self, path: string):
+	def __init__(self, path: str):
 		self.path = path
 		self.connection = sqlite3.connect(path, isolation_level=None, check_same_thread=False)
 		self.connection.row_factory = sqlite3.Row
@@ -35,12 +36,12 @@ class DBWraper:
 		except:
 			pass
 
-	def is_user_exist(self, name: string) -> bool:
+	def is_user_exist(self, name: str) -> bool:
 		query = "SELECT * FROM User WHERE name=?"
 		self.cursor.execute(query, (name,))
 		return len(self.cursor.fetchall()) > 0
 
-	def get_uid(self, name: string, pw: string, ignore_pw=False) -> int:
+	def get_uid(self, name: str, pw: str, ignore_pw=False) -> int:
 		query = "SELECT * FROM User WHERE name=?"
 		self.cursor.execute(query, (name,))
 		row = self.cursor.fetchone()
@@ -53,7 +54,7 @@ class DBWraper:
 		else:
 			return -1
 
-	def add_user(self, name: string, pw: string) -> bool:
+	def add_user(self, name: str, pw: str) -> bool:
 		query = "INSERT INTO User(name, pw, salt, sign_in_time, recent_login_time) VALUES (?, ?, ?, ?, ?)"
 		chars = string.ascii_letters + string.digits
 		salt = ''.join([random.choice(chars) for _ in range(16)])
@@ -64,13 +65,13 @@ class DBWraper:
 			return False
 		return True
 
-	def get_histories(self, uid: int, start: int, to: int) -> list[string]:
+	def get_histories(self, uid: int, start: int, to: int) -> List[str]:
 		query = "SELECT * FROM History WHERE black=? OR white=? ORDER BY id DESC LIMIT ?, ?"
 		self.cursor.execute(query, (uid, uid, start, to))
 		rows = self.cursor.fetchall()
 		return [{'history': row['history'], 'color': 'black' if row['black'] == uid else 'white'} for row in rows]
 
-	def add_history(self, black: int, white: int, history: string) -> bool:
+	def add_history(self, black: int, white: int, history: str) -> bool:
 		query = "INSERT INTO History(black, white, history, timestamp) VALUES (?, ?, ?, ?)"
 		try:
 			self.cursor.execute(query, (black, white, history, int(time.time())))
@@ -82,7 +83,7 @@ class AIAPIWraper:
 	def __init__(self, host, port):
 		self.url = 'http://{}:{}'.format(host, port)
 
-	def predict(self, mode: string, fen: string) -> string:
+	def predict(self, mode: str, fen: str) -> string:
 		url = self.url + '/' + mode
 		response = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps({'fen':fen}))
 		if response.status_code != 200:
@@ -210,7 +211,7 @@ def add_history():
 	current_app.db.add_history(black, white, history)
 	return {'message': 'success'}
 
-def main(ai_api_url: string, ai_api_port: int, web_server_port: int):
+def main(ai_api_url: str, ai_api_port: int, web_server_port: int):
 	app.db = DBWraper('db.db')
 	app.ai = AIAPIWraper(ai_api_url, ai_api_port)
 	app.run(host='0.0.0.0', port=web_server_port)
