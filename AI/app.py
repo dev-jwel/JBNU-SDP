@@ -23,8 +23,8 @@ PlayWithHumanConfig().update_play_config(config.play)
 app = Flask(__name__)
 api = Api(app)
 
-def get_action(player, result):
-	result['action'] = player.action()
+def get_action(player, env, result):
+	result['action'] = player.action(env)
 
 @api.route('/<string:mode>')
 class AI_REST_API(Resource):
@@ -66,7 +66,7 @@ class AI_REST_API(Resource):
 
 		# get action
 		result = {}
-		player_worker = Thread(target=get_action, args=(player, result))
+		player_worker = Thread(target=get_action, args=(player, env, result))
 		player_worker.start()
 		player_worker.join()
 		action = result['action']
