@@ -1,13 +1,9 @@
 # AI server
 
-Only prototype has implemented.
-
 Install dependencies in `AI/requirements.txt` and `AI/src/chess-alpha-zero/requirements.txt`.
 
 Run this prototype by typing `./run.sh`.
 
-You may need to set host to `0.0.0.0` by using argument `--host 0.0.0.0`.
-
-You can use another port by using argument `--port YOUR-PORT`.
+You can use another port by using argument `--port YOUR-PORT` while default is `23456`.
 
 This script prints pid so you can kill this.

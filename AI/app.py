@@ -78,5 +78,27 @@ class AI_REST_API(Resource):
 		# return the action
 		return action
 
+def main(num_thread=None, port=23456):
+	config = Config(config_type='normal')
+	config.resource.create_directories()
+	setup_logger(config.resource.main_log_path)
+	PlayWithHumanConfig().update_play_config(config.play)
+
+	if num_thread is not None:
+		config.play.search_threads = num_thread
+
+	app = Flask(__name__)
+	api = Api(app)
+
+	app.pipe_lock = Lock()
+	app.reserved_pipe_pools = []
+	app.model_lock = Lock()
+	app.model = ChessModel(config)
+
+	if not load_best_model_weight(app.model):
+		raise RuntimeError('Best model not found!')
+
+	app.run(host='0.0.0.0', port=port)
+
 if __name__ == '__main__':
-	Fire(app.run)
+	Fire(main)
