@@ -26,7 +26,8 @@ app = Flask(__name__)
 api = Api(app)
 
 def get_action(player, env, action):
-	action.value = player.action(env)
+	with action.get_lock():
+		action.value = player.action(env)
 
 @api.route('/<string:mode>')
 class AI_REST_API(Resource):
