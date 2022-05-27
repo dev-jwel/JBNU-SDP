@@ -1,9 +1,12 @@
 # venv files
 bin/
 lib/
-lib64/
+lib64
+share/
 include/
 pyvenv.cfg
+
+# pycache
 __pycache__/
 
 # sqlite3 database file
