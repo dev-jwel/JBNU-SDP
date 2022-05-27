@@ -4,7 +4,8 @@ from fire import Fire
 from flask import Flask, request, abort, current_app
 from flask_restx import Api, Resource
 
-from multiprocessing import Process
+import ctypes
+from multiprocessing import Process, Value
 from threading import Lock
 from chess_zero.agent.player_chess import ChessPlayer
 from chess_zero.agent.player_chess import GentleChessPlayer
@@ -24,8 +25,8 @@ PlayWithHumanConfig().update_play_config(config.play)
 app = Flask(__name__)
 api = Api(app)
 
-def get_action(player, env, result):
-	result['action'] = player.action(env)
+def get_action(player, env, action):
+	action.value = player.action(env)
 
 @api.route('/<string:mode>')
 class AI_REST_API(Resource):
@@ -66,11 +67,11 @@ class AI_REST_API(Resource):
 			player = ChessPlayer(config, pipe_pool)
 
 		# get action
-		result = {}
-		player_worker = Process(target=get_action, args=(player, env, result))
+		action = Value(ctypes.c_wchar_p, '1234567890')
+		player_worker = Process(target=get_action, args=(player, env, action))
 		player_worker.start()
 		player_worker.join()
-		action = result['action']
+		action = action.value
 
 		# move pipe_pool into reserved_pipe_pools
 		with pipe_lock:
