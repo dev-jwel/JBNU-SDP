@@ -211,7 +211,7 @@ def add_history():
 	current_app.db.add_history(black, white, history)
 	return {'message': 'success'}
 
-def main(ai_api_url: str, ai_api_port: int, web_server_port: int):
+def main(ai_api_url: str, ai_api_port: int, web_server_port=12345):
 	app.db = DBWraper('db.db')
 	app.ai = AIAPIWraper(ai_api_url, ai_api_port)
 	app.run(host='0.0.0.0', port=web_server_port)

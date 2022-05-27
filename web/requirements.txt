@@ -1,3 +1,4 @@
 flask
 requests
 fire
+python-chess

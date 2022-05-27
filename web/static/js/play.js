@@ -68,7 +68,7 @@ window.predict = function(mode, fen=game.fen()) {
 			res = null
 		},
 		async: false,
-		timeout: 0
+		timeout: 60000
 	})
 
 	return ret
