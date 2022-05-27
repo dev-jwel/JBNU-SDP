@@ -1,0 +1,13 @@
+# venv files
+bin/
+lib/
+lib64/
+include/
+pyvenv.cfg
+__pycache__/
+
+# sqlite3 database file
+db.db
+
+# flask secret key
+secret.key
