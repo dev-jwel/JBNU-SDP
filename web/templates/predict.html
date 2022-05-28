@@ -49,13 +49,16 @@
 			let action_element = document.getElementById('predict-form-received-action')
 
 			action_element.innerHTML = "requesting..."
-			setTimeout(function() {
-				let action = predict(mode, fen);
-				if (action === null) {
-					action = "wrong fen"
+
+			let action = predict(
+				mode, fen,
+				function (res) {
+					action_element.innerHTML = res["action"]
+				},
+				function () {
+					action_element.innerHTML = "failed to predict request"
 				}
-				action_element.innerHTML = JSON.stringify(action)
-			}, 10000)
+			);
 		}
 	</script>
 {% endblock %}

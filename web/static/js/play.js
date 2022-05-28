@@ -46,9 +46,7 @@ function change_color(square_button, color) {
 	square_button.style.backgroundColor = color
 }
 
-window.predict = function(mode, fen=game.fen()) {
-	let ret = null
-
+window.predict = function(mode, fen=game.fen(), on_success, on_error) {
 	$.ajax({
 		url: "/predict",
 		type: "POST",
@@ -60,18 +58,15 @@ window.predict = function(mode, fen=game.fen()) {
 		success: function(res) {
 			console.log('res')
 			console.log(res)
-			ret = res
+			on_success(res)
 		},
 		error: function(error) {
 			console.log('error')
 			console.log(error)
-			ret = null
+			on_error()
 		},
-		async: false,
 		timeout: 60000
 	})
-
-	return ret
 }
 
 window.debug = function() {
