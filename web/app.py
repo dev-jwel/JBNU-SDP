@@ -95,6 +95,19 @@ app = Flask(__name__)
 chars = string.ascii_letters + string.digits
 app.secret_key = ''.join([random.choice(chars) for _ in range(16)])
 
+def get_message():
+	message = ''
+
+	name = session.get('name', None)
+	if name is not None:
+		message = 'hello {}'.format(name)
+
+	session_message = session.pop('message', None)
+	if session_message is not None:
+		message = session_message
+
+	return message
+
 #############
 # TEST ONLY #
 #############
@@ -108,25 +121,26 @@ def root():
 
 @app.route('/index', methods=['GET'])
 def index():
-	return render_template('index.html')
+	return render_template('index.html', message=get_message(), uid=session.get('uid', -1))
 
 @app.route('/play', methods=['GET'])
 def play():
-	return render_template('play.html')
+	return render_template('play.html', message=get_message(), uid=session.get('uid', -1))
 
 @app.route('/history', methods=['GET'])
 def history():
-	return render_template('history.html')
+	return render_template('history.html', message=get_message(), uid=session.get('uid', -1))
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
 	session.pop('uid', None)
-	return redirect('index')
+	session.pop('name', None)
+	return redirect('/index')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == 'GET':
-		return render_template('login.html')
+		return render_template('login.html', message=get_message(), uid=session.get('uid', -1))
 
 	name = request.form['name']
 	pw = request.form['pw']
@@ -135,18 +149,26 @@ def login():
 
 	if uid != -1:
 		session['uid'] = uid
-	return redirect('index')
+		session['name'] = name
+	else:
+		session['message'] = 'login failed'
+
+	return redirect('/index')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 	if request.method == 'GET':
-		return render_template('register.html')
+		return render_template('register.html', message=get_message(), uid=session.get('uid', -1))
 
 	name = request.form['name']
 	pw = request.form['pw']
 
-	current_app.db.add_user(name, pw)
-	return redirect('login')
+	if current_app.db.add_user(name, pw):
+		session['message'] = 'registered'
+	else:
+		session['message'] = 'failed to register'
+
+	return redirect('/login')
 
 @app.route('/check_user', methods=['POST'])
 def check_user():
@@ -163,7 +185,7 @@ def check_user():
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
 	if request.method == 'GET':
-		return render_template('predict.html')
+		return render_template('predict.html', message=get_message(), uid=session.get('uid', -1))
 
 	mode = request.form['mode']
 	fen = request.form['fen']

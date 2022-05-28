@@ -13,19 +13,38 @@
 	</head>
 
 	<body>
+		<div style="display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr 9fr; width: 100%; height: 100%;">
+			<div style="grid-column: 1; grid-row: 1; display: grid; grid-template-columns: 1fr 15fr 4fr; grid-template-rows: 1fr; width: 100%; height: 100%;">
+				<div style="grid-column: 1; grid-row: 1;">
+					<a href="https://github.com/dev-jwel/JBNU-SDP"><img src="{{ url_for('static', filename='img/Github.png') }}"></a>
+				</div>
+
+				<div style="text-align: center; grid-column: 2; grid-row: 1;">
+					<p style="font-size: 5em;">{{ message }}</p>
+				</div>
+
+				<div style="grid-column: 3; grid-row: 1;">
+{% if uid != -1 %}
+					<button type="button" style="width: 100%; height: 100%;" onclick="location.href='logout'"><p style="font-size: 5em;">logout</p></button>
+{% endif %}
+				</div>
+			</div>
+
 {% block body %}
-		<div style="display: grid; grid-template-columns: 1fr; grid-template-rows: 2fr 7fr 2fr 7fr 2fr; width: 100%; height: 100%;">
-			<div style="grid-column: 1; grid-row: 1;"></div>
-			<div style="text-align: center; grid-column: 1; grid-row: 2;">
-				<button type="button" style="width: 75%; height: 100%;" onclick="location.href='login'"><p style="font-size: 5em;">login</p></button>
+			<div style="grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 1fr; grid-template-rows: 2fr 7fr 2fr 7fr 2fr; width: 100%; height: 100%;">
+				<div style="grid-column: 1; grid-row: 1;"></div>
+				<div style="text-align: center; grid-column: 1; grid-row: 2;">
+					<button type="button" style="width: 75%; height: 100%;" onclick="location.href='login'"><p style="font-size: 5em;">login</p></button>
+				</div>
+				<div style="grid-column: 1; grid-row: 3;"></div>
+				<div style="text-align: center; grid-column: 1; grid-row: 4;">
+					<button type="button" style="width: 75%; height: 100%;" onclick="location.href='play'"><p style="font-size: 5em;">play now</p></button>
+				</div>
+				<div style="grid-column: 1; grid-row: 5;"></div>
 			</div>
-			<div style="grid-column: 1; grid-row: 3;"></div>
-			<div style="text-align: center; grid-column: 1; grid-row: 4;">
-				<button type="button" style="width: 75%; height: 100%;" onclick="location.href='play'"><p style="font-size: 5em;">play now</p></button>
-			</div>
-			<div style="grid-column: 1; grid-row: 5;"></div>
-		</div>
 {% endblock %}
+
+		</div>
 	</body>
 
 </html>
