@@ -26,7 +26,7 @@ app = Flask(__name__)
 api = Api(app)
 
 def get_action(player, env, action):
-	action.value = player.action(env)
+	action.value = player.action(env, return_confidence=True)
 
 @api.route('/<string:mode>')
 class AI_REST_API(Resource):
@@ -79,7 +79,7 @@ class AI_REST_API(Resource):
 			reserved_pipe_pools.append(pipe_pool)
 
 		# return the action
-		return action
+		return {'action': action[0], 'confidence': action[1]}
 
 def main(num_thread=None, port=23456):
 	if num_thread is not None:
