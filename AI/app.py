@@ -23,7 +23,9 @@ MODES = ['easy', 'hard']
 config = Config(config_type='normal')
 config.resource.create_directories()
 setup_logger(config.resource.main_log_path)
-PlayWithHumanConfig().update_play_config(config.play)
+hc = PlayWithHumanConfig()
+hc.tau_decay_rate = 0.99 # maintain probabilitic prediction
+hc.update_play_config(config.play)
 
 app = Flask(__name__)
 api = Api(app)
