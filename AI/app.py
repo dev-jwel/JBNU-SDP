@@ -1,5 +1,6 @@
 import chess
 import random
+import sqlite3
 from fire import Fire
 from flask import Flask, request, abort, current_app
 from flask_restx import Api, Resource
@@ -7,6 +8,7 @@ from flask_restx import Api, Resource
 import ctypes
 from multiprocessing import Process, Value, Manager
 from threading import Lock
+
 from chess_zero.agent.player_chess import ChessPlayer
 from chess_zero.agent.player_chess import GentleChessPlayer
 from chess_zero.config import Config, PlayWithHumanConfig
@@ -28,6 +30,21 @@ api = Api(app)
 def get_action(player, env, action):
 	action.value = player.action(env, return_confidence=True)
 
+def clear_white_space(fen):
+	new_fen = fen
+	fen = ''
+
+	while fen != new_fen:
+		fen = new_fen
+		new_fen = fen.replace('  ', ' ')
+
+	if fen[0] == ' ':
+		fen = fen[1:]
+	if fen[-1] == ' ':
+		fen = fen[:-1]
+
+	return fen
+
 @api.route('/<string:mode>')
 class AI_REST_API(Resource):
 	def post(self, mode):
@@ -39,17 +56,26 @@ class AI_REST_API(Resource):
 		model_lock = current_app.model_lock
 		model = current_app.model
 
+		# check request
 		if not mode in MODES:
 			return abort(400, 'wrong mode')
 		if 'fen' not in req:
 			return abort(400, 'there is no fen in the request')
+		fen = clear_white_space(req['fen'])
 
 		# create env
 		try:
 			env = ChessEnv()
-			env.update(req['fen'])
+			env.update(fen)
 		except:
 			return abort(400, 'wrong fen format')
+
+		# try to get cache
+		query = "SELECT * FROM Cache WHERE fen=?"
+		app.db_cursor.execute(query, (fen, ))
+		row = app.db_cursor.fetchone()
+		if row is not None:
+			return {'action': row['action'], 'confidence': row['confidence']}
 
 		# get pipe_pool
 		pipe_pool = None
@@ -68,18 +94,26 @@ class AI_REST_API(Resource):
 
 		# get action
 		manager = Manager()
-		action = manager.Value(ctypes.c_wchar_p, '1234567890')
+		action = manager.Value(ctypes.c_wchar_p, '')
 		player_worker = Process(target=get_action, args=(player, env, action))
 		player_worker.start()
 		player_worker.join()
 		action = action.value
+		action, confidence = action
 
 		# move pipe_pool into reserved_pipe_pools
 		with pipe_lock:
 			reserved_pipe_pools.append(pipe_pool)
 
+		# try to put cache
+		query = "INSERT INTO Cache(fen, action, confidence) VALUES (?, ?, ?)"
+		try:
+			app.db_cursor.execute(query, (fen, action, confidence))
+		except:
+			pass
+
 		# return the action
-		return {'action': action[0], 'confidence': action[1]}
+		return {'action': action, 'confidence': confidence}
 
 def main(num_thread=None, port=23456):
 	if num_thread is not None:
@@ -89,6 +123,17 @@ def main(num_thread=None, port=23456):
 	app.reserved_pipe_pools = []
 	app.model_lock = Lock()
 	app.model = ChessModel(config)
+
+	db_connection = sqlite3('db.db', isolation_level=None, check_same_thread=False)
+	db_connection.row_factory = sqlite3.Row
+	app.db_cursor = db_connection.cursor()
+
+	app.db_cursor.execute('''CREATE TABLE IF NOT EXISTS Cache (
+		id INTEGER PRIMARY KEY UNIQUE,
+		fen TEXT UNIQUE,
+		action TEXT,
+		confidence REAL
+	)''')
 
 	if not load_best_model_weight(app.model):
 		raise RuntimeError('Best model not found!')
