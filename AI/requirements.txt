@@ -1,3 +1,7 @@
 fire
 flask
 flask-restx
+grequests
+numpy
+tqdm
+matplotlib
