@@ -65,7 +65,7 @@ window.predict = function(mode, fen=game.fen()) {
 		error: function(error) {
 			console.log('error')
 			console.log(error)
-			res = null
+			ret = null
 		},
 		async: false,
 		timeout: 60000
