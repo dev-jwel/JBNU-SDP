@@ -29,7 +29,7 @@ app = Flask(__name__)
 api = Api(app)
 
 def get_action(player, env, ret):
-	res = player.action(env, return_confidence=True)
+	res = player.action(env, return_all=True)
 	ret['action'], ret['probabilities'], ret['confidence'] = res
 
 def clear_white_space(fen):
@@ -67,7 +67,7 @@ def get_cache(cursor, mode, fen):
 	probabilities /= np.sum(probabilities)
 
 	action = np.random.choice(range(config.n_labels), p=probabilities)
-	return config.labels[action], confidence[action]
+	return {'action': config.labels[action], 'confidence': confidence[action]}
 
 def put_cache(cursor, mode, fen, probabilities, confidence):
 	query = "INSERT INTO Cache(mode, fen) VALUES (?, ?)"
@@ -139,7 +139,7 @@ class AI_REST_API(Resource):
 		# get action
 		manager = Manager()
 		ret = manager.dict()
-		player_worker = Process(target=get_action, args=(player, env, action))
+		player_worker = Process(target=get_action, args=(player, env, ret))
 		player_worker.start()
 		player_worker.join()
 		action = ret['action']
@@ -154,7 +154,7 @@ class AI_REST_API(Resource):
 		put_cache(app.db_cursor, mode, fen, probabilities, confidence)
 
 		# return the action
-		return {'action': action, 'confidence': confidence}
+		return {'action': config.labels[action], 'confidence': confidence[action]}
 
 def main(num_thread=None, port=23456):
 	if num_thread is not None:
