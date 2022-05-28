@@ -71,8 +71,8 @@ class AI_REST_API(Resource):
 			return abort(400, 'wrong fen format')
 
 		# try to get cache
-		query = "SELECT * FROM Cache WHERE fen=?"
-		app.db_cursor.execute(query, (fen, ))
+		query = "SELECT * FROM Cache WHERE mode=? AND fen=?"
+		app.db_cursor.execute(query, (mode, fen))
 		row = app.db_cursor.fetchone()
 		if row is not None:
 			return {'action': row['action'], 'confidence': row['confidence']}
@@ -106,9 +106,9 @@ class AI_REST_API(Resource):
 			reserved_pipe_pools.append(pipe_pool)
 
 		# try to put cache
-		query = "INSERT INTO Cache(fen, action, confidence) VALUES (?, ?, ?)"
+		query = "INSERT INTO Cache(mode, fen, action, confidence) VALUES (?, ?, ?, ?)"
 		try:
-			app.db_cursor.execute(query, (fen, action, confidence))
+			app.db_cursor.execute(query, (mode, fen, action, confidence))
 		except:
 			pass
 
@@ -124,15 +124,17 @@ def main(num_thread=None, port=23456):
 	app.model_lock = Lock()
 	app.model = ChessModel(config)
 
-	db_connection = sqlite3('db.db', isolation_level=None, check_same_thread=False)
+	db_connection = sqlite3.connect('db.db', isolation_level=None, check_same_thread=False)
 	db_connection.row_factory = sqlite3.Row
 	app.db_cursor = db_connection.cursor()
 
 	app.db_cursor.execute('''CREATE TABLE IF NOT EXISTS Cache (
 		id INTEGER PRIMARY KEY UNIQUE,
-		fen TEXT UNIQUE,
+		mode TEXT,
+		fen TEXT,
 		action TEXT,
-		confidence REAL
+		confidence REAL,
+		UNIQUE(mode, fen)
 	)''')
 
 	if not load_best_model_weight(app.model):
