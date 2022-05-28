@@ -1,6 +1,7 @@
 import chess
 import random
 import sqlite3
+import numpy as np
 from fire import Fire
 from flask import Flask, request, abort, current_app
 from flask_restx import Api, Resource
@@ -27,8 +28,9 @@ PlayWithHumanConfig().update_play_config(config.play)
 app = Flask(__name__)
 api = Api(app)
 
-def get_action(player, env, action):
-	action.value = player.action(env, return_confidence=True)
+def get_action(player, env, ret):
+	res = player.action(env, return_confidence=True)
+	ret['action'], ret['probabilities'], ret['confidence'] = res
 
 def clear_white_space(fen):
 	new_fen = fen
@@ -44,6 +46,50 @@ def clear_white_space(fen):
 		fen = fen[:-1]
 
 	return fen
+
+def get_cache(cursor, mode, fen):
+	query = "SELECT * FROM Cache WHERE mode=? AND fen=?"
+	cursor.execute(query, (mode, fen))
+	row = cursor.fetchone()
+
+	if row is None:
+		return None
+
+	query = "SELECT * FROM ActionProbs WHERE cacheid=?"
+	cursor.execute(query, (row['id'],))
+	rows = cursor.fetchall()
+
+	confidence = {}
+	probabilities = np.zeros(config.n_labels)
+	for row in rows:
+		probabilities[row['action']] = row['probability']
+		confidence[row['action']] = row['confidence']
+	probabilities /= np.sum(probabilities)
+
+	action = np.random.choice(range(config.n_labels), p=probabilities)
+	return config.labels[action], confidence[action]
+
+def put_cache(cursor, mode, fen, probabilities, confidence):
+	query = "INSERT INTO Cache(mode, fen) VALUES (?, ?)"
+	try:
+		cursor.execute(query, (mode, fen))
+	except:
+		return
+
+	query = "SELECT * FROM Cache WHERE mode=? AND fen=?"
+	try:
+		cursor.execute(query, (mode, fen))
+		cacheid = cursor.fetchone()['id']
+	except:
+		return
+
+	query = "INSERT INTO ActionProbs(cacheid, action, probability, confidence) VALUES (?, ?, ?, ?)"
+	for action, (probability, conf) in enumerate(zip(probabilities, confidence)):
+		if probability != 0:
+			try:
+				cursor.execute(query, (cacheid, action, probability, conf))
+			except:
+				pass
 
 @api.route('/<string:mode>')
 class AI_REST_API(Resource):
@@ -71,11 +117,9 @@ class AI_REST_API(Resource):
 			return abort(400, 'wrong fen format')
 
 		# try to get cache
-		query = "SELECT * FROM Cache WHERE mode=? AND fen=?"
-		app.db_cursor.execute(query, (mode, fen))
-		row = app.db_cursor.fetchone()
-		if row is not None:
-			return {'action': row['action'], 'confidence': row['confidence']}
+		action = get_cache(app.db_cursor, mode, fen)
+		if action is not None:
+			return action
 
 		# get pipe_pool
 		pipe_pool = None
@@ -94,23 +138,20 @@ class AI_REST_API(Resource):
 
 		# get action
 		manager = Manager()
-		action = manager.Value(ctypes.c_wchar_p, '')
+		ret = manager.dict()
 		player_worker = Process(target=get_action, args=(player, env, action))
 		player_worker.start()
 		player_worker.join()
-		action = action.value
-		action, confidence = action
+		action = ret['action']
+		probabilities = ret['probabilities']
+		confidence = ret['confidence']
 
 		# move pipe_pool into reserved_pipe_pools
 		with pipe_lock:
 			reserved_pipe_pools.append(pipe_pool)
 
 		# try to put cache
-		query = "INSERT INTO Cache(mode, fen, action, confidence) VALUES (?, ?, ?, ?)"
-		try:
-			app.db_cursor.execute(query, (mode, fen, action, confidence))
-		except:
-			pass
+		put_cache(app.db_cursor, mode, fen, probabilities, confidence)
 
 		# return the action
 		return {'action': action, 'confidence': confidence}
@@ -128,12 +169,20 @@ def main(num_thread=None, port=23456):
 	db_connection.row_factory = sqlite3.Row
 	app.db_cursor = db_connection.cursor()
 
+	app.db_cursor.execute('''CREATE TABLE IF NOT EXISTS ActionProbs (
+		id INTEGER PRIMARY KEY UNIQUE,
+		cacheid INTEGER,
+		action INTEGER,
+		probability REAL,
+		confidence REAL,
+		UNIQUE(cacheid, action),
+		FOREIGN KEY(cacheid) REFERENCES Cache(id)
+	)''')
+
 	app.db_cursor.execute('''CREATE TABLE IF NOT EXISTS Cache (
 		id INTEGER PRIMARY KEY UNIQUE,
 		mode TEXT,
 		fen TEXT,
-		action TEXT,
-		confidence REAL,
 		UNIQUE(mode, fen)
 	)''')
 
