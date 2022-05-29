@@ -126,11 +126,20 @@ function square_click_callback(square) {
 		if (legal_squares.includes(square)) {
 			// TODO: add promotion
 			game.move({from: selected_square, to: square}, {sloppy: true})
+			if (game.game_over()) {
+				finish_game()
+			}
+
 			selected_square = null
 			selected_square_button = null
 			clear_color()
 			render_board()
+
 			ai_move(mode, true)
+			if (game.game_over()) {
+				finish_game()
+			}
+
 			render_board()
 		}
 	}
@@ -216,6 +225,37 @@ function ai_move(mode, apply_move) {
 	)
 }
 
+function finish_game() {
+	let history = []
+	for (move of game.history({verbose: true})) {
+		history.push(move.from + move.to)
+	}
+
+	if (!anonymous) {
+		$.ajax({
+			url: "/add-history",
+			type: "POST",
+			datatype: "json",
+			data: {
+				"mode": mode,
+				"player-color": user_color,
+				"history": history.join(',')
+			},
+			error: function (error) {
+				console.log(error)
+			}
+		})
+	}
+
+	alert("game over!")
+
+	if (!anonymous) {
+		location.href = "/history-page"
+	} else {
+		location.href = "/"
+	}
+}
+
 function change_mode() {
 	if (mode === "easy") {
 		mode = "hard"
@@ -248,22 +288,70 @@ function undo() {
 	}
 }
 
+// debug only
+function auto_single(is_my_turn) {
+	if (game.game_over()) {
+		finish_game()
+		return
+	}
+
+	let m = mode
+	if (!is_my_turn) {
+		m = "hard"
+	}
+
+	predict (
+		m,
+		game.fen(),
+		function (res) {
+			console.log(res)
+			let move = game.move(res["action"], {sloppy: true})
+			console.log(move)
+
+			render_board()
+			clear_color()
+			let from_square_button = document.getElementById(move.from).children[0]
+			let to_square_button = document.getElementById(move.to).children[0]
+			change_color(from_square_button, color_ai)
+			change_color(to_square_button, color_ai)
+
+			auto_single(!is_my_turn)
+		},
+		function (error) {
+			alert('failed to request')
+		},
+		function () {
+		}
+	)
+}
+function auto() {
+	if (!is_predict_requested) {
+		document.getElementById("status").innerHTML = "AUTO"
+		is_predict_requested = true
+		auto_single(true)
+	}
+}
+
+window.game = game
 window.initialze_game = initialze_game
 window.square_click_callback = square_click_callback
 window.change_mode = change_mode
+window.render_board = render_board
 window.hint = hint
 window.undo = undo
 
 // DEBUG
 window.predict = predict
-window.game = game
+window.finish_game = finish_game
 window.selected_square = selected_square
 window.selected_square_button = selected_square_button
 window.is_predict_requested = is_predict_requested
+window.ai_move = ai_move
 
 window.user_color = user_color
 window.ai_color = ai_color
 window.mode = mode
+window.auto = auto
 
 /*
 class OptionSelector {

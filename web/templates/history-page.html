@@ -1,0 +1,39 @@
+{% extends "index.html" %}
+
+{% block title %}History page{% endblock %}
+
+{% block body %}
+	<div style="width: 100%; height:100; display: grid; grid-template-columns: 1fr; grid-template-rows: 9fr 1fr;">
+		<div style="width: 100%; height:100; display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; grid-column: 1; grid-row: 1;">
+	{% for history in histories %}
+			<div style="width: 100%; height:100; grid-column: 1; grid-row: {{ loop.index }};">
+				<button type="button" style="width:100%; height:100%; background-color: #0000FF" onclick="location.href='history-game?id={{ history['id'] }}&view={{ history['color'] }}'">
+					<p>
+		{% if history['color'] == 'black' %}
+						<span style="color: #000000">
+							{{ name }}
+						</span>
+						<span style="color: #FF0000">
+							VS
+						</span>
+						<span style="color: #FFFFFF">
+							{{ history['enemy'] }}
+						</span>
+		{% else %}
+						<span style="color: #FFFFFF">
+							{{ name }}
+						</span>
+						<span style="color: #FF0000">
+							VS
+						</span>
+						<span style="color: #000000">
+							{{ history['enemy'] }}
+						</span>
+		{% endif %}
+					</p>
+				</button>
+			</div>
+	{% endfor %}
+		</div>
+	</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "play.html" %}
+
+{% block title %}Play Chess Game{% endblock %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/board.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+	{% if view == 'black' %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/black-user.css') }}">
+	{% else %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/white-user.css') }}">
+	{% endif %}
+{% endblock %}
+
+{% block control_pane %}
+	<div class="turn-pane">
+		<p id="turn">white</p>
+	</div>
+	<div class="prev-pane">
+		<button type="button" style="width: 100%; height: 100%;" onclick="prev()">
+			<p>prev</p>
+		</button>
+	</div>
+	<div class="next-pane">
+		<button type="button" style="width: 100%; height: 100%;" onclick="next()">
+			<p>next</p>
+		</button>
+	</div>
+{% endblock %}
+
+{% block script %}
+	<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+	<script src="{{ url_for('static', filename='js/game.js') }}" type="module"></script>
+	<script>
+		let turn = 0
+		let history = {{ history | tojson | safe }}
+		let square_click_callback = function (square) {} // do nothing
+
+		function prev() {
+			if (turn > 0) {
+				turn -= 1
+				game.undo()
+				render_board()
+			}
+		}
+
+		function next() {
+			if (turn < history.length) {
+				game.move(history[turn], {sloppy: true})
+				turn += 1
+				render_board()
+			}
+		}
+
+		window.onload = function () {render_board()}
+	</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "index.html" %}
+
+{% block title %}TEST ONLY{% endblock %}
+
+{% block body %}
+	<form id="put-history-form" action="add-history" style="width: 100%; height: 100%;" method="POST">
+		<div style="display: grid; grid-template-columns: 1fr; grid-template-rows: 6fr 1fr 6fr 1fr 6fr; width: 100%; height: 100%;">
+			<div style="text-align: center; grid-column: 1; grid-row: 1; width: 100%; height: 100%;">
+				<input style="width: 100%; height: 100%; font-size: 5em" type="text" name="history" value="c2c4,...">
+			</div>
+
+			<div style="grid-column: 1; grid-row: 2;"></div>
+
+			<div style="text-align: center; grid-column: 1; grid-row: 3; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; width: 100%; height: 100%;">
+				<div style="text-align: center; grid-column: 1; grid-row: 1">
+					<input style="width: 100%; height: 100%; font-size: 5em;" id="predict-radio-easy" type="text" name="mode" value="hard">
+				</div>
+				<div style="text-align: center; grid-column: 2; grid-row: 1">
+					<input style="width: 100%; height: 100%; font-size: 5em;" id="predict-radio-hard" type="text" name="player-color" value="black">
+				</div>
+			</div>
+
+			<div style="grid-column: 1; grid-row: 4;"></div>
+
+			<div style="text-align: center; grid-column: 1; grid-row: 5; width: 100%; height: 100%;">
+				<button type="submit" style="width: 100%; height: 100%;"><p>put history</p></button>
+			</div>
+		</div>
+	</form>
+{% endblock %}

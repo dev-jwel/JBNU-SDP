@@ -1,7 +1,7 @@
 from fire import Fire
 import os, time, json, chess, string, random, hashlib, sqlite3, requests
 from flask import Flask, request, abort, render_template, redirect, current_app, session
-from typing import List
+from typing import List, Dict, Union, Optional
 
 class DBWraper:
 	def __init__(self, path: str):
@@ -54,6 +54,14 @@ class DBWraper:
 		else:
 			return -1
 
+	def get_user_name(self, uid: int) -> Optional[str]:
+		query = "SELECT * FROM User WHERE id=?"
+		self.cursor.execute(query, (uid,))
+		row = self.cursor.fetchone()
+		if row is None:
+			return None
+		return row['name']
+
 	def add_user(self, name: str, pw: str) -> bool:
 		query = "INSERT INTO User(name, pw, salt, sign_in_time, recent_login_time) VALUES (?, ?, ?, ?, ?)"
 		chars = string.ascii_letters + string.digits
@@ -65,11 +73,29 @@ class DBWraper:
 			return False
 		return True
 
-	def get_histories(self, uid: int, start: int, to: int) -> List[str]:
+	def get_history(self, history_id: int) -> Optional[str]:
+		query = "SELECT * FROM History WHERE id=?"
+		self.cursor.execute(query, (history_id,))
+		row = self.cursor.fetchone()
+		if row is None:
+			return None
+		return row['history']
+
+	def get_histories(self, uid: int, start: int, to: int) -> List[Dict[str, Union[int, str]]]:
 		query = "SELECT * FROM History WHERE black=? OR white=? ORDER BY id DESC LIMIT ?, ?"
 		self.cursor.execute(query, (uid, uid, start, to))
 		rows = self.cursor.fetchall()
-		return [{'history': row['history'], 'color': 'black' if row['black'] == uid else 'white'} for row in rows]
+
+		histories = []
+		for row in rows:
+			history = {}
+			history['id'] = row['id']
+			history['color'] = 'black' if row['black'] == uid else 'white'
+			history['enemy'] = row['white'] if row['black'] == uid else row['black']
+			history['enemy'] = self.get_user_name(history['enemy'])
+			histories.append(history)
+
+		return histories
 
 	def add_history(self, black: int, white: int, history: str) -> bool:
 		query = "INSERT INTO History(black, white, history, timestamp) VALUES (?, ?, ?, ?)"
@@ -115,6 +141,13 @@ def get_message():
 def uid():
 	return str(session.get('uid', -1))
 
+#############
+# TEST ONLY #
+#############
+@app.route('/history-debug', methods=['GET'])
+def history_debug():
+	return render_template('history-debug.html', message=get_message(), uid=session.get('uid', -1))
+
 @app.route('/', methods=['GET'])
 def root():
 	return redirect('/index')
@@ -127,9 +160,42 @@ def index():
 def play():
 	return render_template('play.html', message=get_message(), uid=session.get('uid', -1))
 
-@app.route('/history', methods=['GET'])
-def history():
-	return render_template('history.html', message=get_message(), uid=session.get('uid', -1))
+@app.route('/history-page', methods=['GET'])
+def history_page():
+	if session.get('uid', -1) == -1:
+		abort(400, 'login first')
+
+	page = request.args.get('page', 1)
+	limit_start = 10 * (page-1)
+	limit_end = 10 * page
+
+	histories = current_app.db.get_histories(session['uid'], limit_start, limit_end)
+	return render_template(
+		'history-page.html',
+		message=get_message(),
+		uid=session.get('uid', -1),
+		name=session.get('name', None),
+		histories=histories,
+		num_page=page
+	)
+
+@app.route('/history-game', methods=['GET'])
+def history_game():
+	history_id = request.args.get('id')
+	view = request.args.get('view')
+
+	history = current_app.db.get_history(history_id)
+	if history == None:
+		return abort(404, "no such history")
+	history = history.split(',')
+
+	return render_template(
+		'history-game.html',
+		message=get_message(),
+		uid=session.get('uid', -1),
+		history=history,
+		view=view
+	)
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
@@ -170,15 +236,6 @@ def register():
 
 	return redirect('/login')
 
-@app.route('/check_user', methods=['POST'])
-def check_user():
-	name = request.form['name']
-
-	if current_app.db.is_user_exist(name):
-		return {'message': 'user is exist'}
-	else:
-		return {'message': 'user is not exist'}
-
 ###########################
 # GET METHOD IS TEST ONLY #
 ###########################
@@ -195,43 +252,43 @@ def predict():
 		return abort(400, 'worng mode or fen')
 	return action
 
-@app.route('/get_histories', methods=['POST'])
-def get_histories():
-	page = request.form['page']
-
-	limit_start = 10 * (page-1)
-	limit_end = 10 * page
-
-	if session.uid is None:
-		return {'message': 'login first'}
-
-	return {
-		'message': 'success',
-		'result': current_app.db.get_histories(session.uid, limit_start, limit_end)
-	}
-
-@app.route('/add_history', methods=['POST'])
+@app.route('/add-history', methods=['POST'])
 def add_history():
 	mode = request.form['mode']
-	player_color = request.form['player_color']
+	player_color = request.form['player-color']
 	history = request.form['history']
 
-	if session.uid is None:
-		return {'message': 'login first'}
+	if session.get('uid', -1) == -1:
+		return abort(400, 'login first')
 
 	if player_color not in ['black', 'white']:
-		return {'message': 'wrong color'}
+		return abort(400, 'wrong color')
 
 	ai_uid = current_app.db.get_uid(mode, pw='', ignore_pw=True)
 	if player_color == 'black':
-		black = session.uid
-		id
+		black = session['uid']
+		white = ai_uid
 	else:
 		black = ai_uid
-		white = session.uid
+		white = session['uid']
 
-	current_app.db.add_history(black, white, history)
-	return {'message': 'success'}
+	history_list = history.split(',')
+
+	try:
+		board = chess.Board()
+		for action in history_list:
+			board.push_uci(action)
+		is_valid = board.outcome() is not None
+	except:
+		is_valid = False
+
+	if not is_valid:
+		return(400, 'wrong history')
+
+	if current_app.db.add_history(black, white, history):
+		return 'success'
+	else:
+		return abort(500, 'failed')
 
 def main(ai_api_url: str, ai_api_port: int, web_server_port=12345):
 	app.db = DBWraper('db.db')
