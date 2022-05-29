@@ -2,6 +2,7 @@ from fire import Fire
 import os, time, json, chess, string, random, hashlib, sqlite3, requests
 from flask import Flask, request, abort, render_template, redirect, current_app, session
 from typing import List, Dict, Union, Optional
+from threading import Lock
 
 class DBWraper:
 	def __init__(self, path: str):
@@ -9,6 +10,7 @@ class DBWraper:
 		self.connection = sqlite3.connect(path, isolation_level=None, check_same_thread=False)
 		self.connection.row_factory = sqlite3.Row
 		self.cursor = self.connection.cursor()
+		self.lock = Lock()
 
 		self.cursor.execute('''CREATE TABLE IF NOT EXISTS User (
 			id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
@@ -38,26 +40,30 @@ class DBWraper:
 
 	def is_user_exist(self, name: str) -> bool:
 		query = "SELECT * FROM User WHERE name=?"
-		self.cursor.execute(query, (name,))
+		with self.lock:
+			self.cursor.execute(query, (name,))
 		return len(self.cursor.fetchall()) > 0
 
 	def get_uid(self, name: str, pw: str, ignore_pw=False) -> int:
 		query = "SELECT * FROM User WHERE name=?"
-		self.cursor.execute(query, (name,))
-		row = self.cursor.fetchone()
+		with self.lock:
+			self.cursor.execute(query, (name,))
+			row = self.cursor.fetchone()
 		if row is None:
 			return -1
 		if ignore_pw or hashlib.sha256((row['salt']+pw).encode()).hexdigest() == row['pw']:
 			query = "UPDATE User SET recent_login_time=? WHERE id=?"
-			self.cursor.execute(query, (int(time.time()), row['id']))
+			with self.lock:
+				self.cursor.execute(query, (int(time.time()), row['id']))
 			return row['id']
 		else:
 			return -1
 
 	def get_user_name(self, uid: int) -> Optional[str]:
 		query = "SELECT * FROM User WHERE id=?"
-		self.cursor.execute(query, (uid,))
-		row = self.cursor.fetchone()
+		with self.lock:
+			self.cursor.execute(query, (uid,))
+			row = self.cursor.fetchone()
 		if row is None:
 			return None
 		return row['name']
@@ -68,23 +74,26 @@ class DBWraper:
 		salt = ''.join([random.choice(chars) for _ in range(16)])
 		pw = hashlib.sha256((salt+pw).encode()).hexdigest()
 		try:
-			self.cursor.execute(query, (name, pw, salt, int(time.time()), int(time.time())))
+			with self.lock:
+				self.cursor.execute(query, (name, pw, salt, int(time.time()), int(time.time())))
 		except:
 			return False
 		return True
 
 	def get_history(self, history_id: int) -> Optional[str]:
 		query = "SELECT * FROM History WHERE id=?"
-		self.cursor.execute(query, (history_id,))
-		row = self.cursor.fetchone()
+		with self.lock:
+			self.cursor.execute(query, (history_id,))
+			row = self.cursor.fetchone()
 		if row is None:
 			return None
 		return row['history']
 
 	def get_histories(self, uid: int, start: int, to: int) -> List[Dict[str, Union[int, str]]]:
 		query = "SELECT * FROM History WHERE black=? OR white=? ORDER BY id DESC LIMIT ?, ?"
-		self.cursor.execute(query, (uid, uid, start, to))
-		rows = self.cursor.fetchall()
+		with self.lock:
+			self.cursor.execute(query, (uid, uid, start, to))
+			rows = self.cursor.fetchall()
 
 		histories = []
 		for row in rows:
@@ -100,7 +109,8 @@ class DBWraper:
 	def add_history(self, black: int, white: int, history: str) -> bool:
 		query = "INSERT INTO History(black, white, history, timestamp) VALUES (?, ?, ?, ?)"
 		try:
-			self.cursor.execute(query, (black, white, history, int(time.time())))
+			with self.lock:
+				self.cursor.execute(query, (black, white, history, int(time.time())))
 		except:
 			return False
 		return True

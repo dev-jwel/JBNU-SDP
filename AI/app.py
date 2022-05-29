@@ -103,6 +103,7 @@ class AI_REST_API(Resource):
 		reserved_pipe_pools = current_app.reserved_pipe_pools
 		model_lock = current_app.model_lock
 		model = current_app.model
+		db_lock = current_app.db_lock
 
 		# check request
 		if not mode in MODES:
@@ -119,7 +120,8 @@ class AI_REST_API(Resource):
 			return abort(400, 'wrong fen format')
 
 		# try to get cache
-		action = get_cache(app.db_cursor, mode, fen)
+		with db_lock:
+			action = get_cache(app.db_cursor, mode, fen)
 		if action is not None:
 			return action
 
@@ -153,7 +155,8 @@ class AI_REST_API(Resource):
 			reserved_pipe_pools.append(pipe_pool)
 
 		# try to put cache
-		put_cache(app.db_cursor, mode, fen, probabilities, confidence)
+		with db_lock:
+			put_cache(app.db_cursor, mode, fen, probabilities, confidence)
 
 		# return the action
 		return {'action': config.labels[action], 'confidence': confidence[action]}
@@ -170,6 +173,7 @@ def main(num_thread=None, port=23456):
 	db_connection = sqlite3.connect('db.db', isolation_level=None, check_same_thread=False)
 	db_connection.row_factory = sqlite3.Row
 	app.db_cursor = db_connection.cursor()
+	app.db_lock = Lock()
 
 	app.db_cursor.execute('''CREATE TABLE IF NOT EXISTS ActionProbs (
 		id INTEGER PRIMARY KEY UNIQUE,
