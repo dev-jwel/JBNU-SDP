@@ -227,7 +227,7 @@ function ai_move(mode, apply_move) {
 
 function finish_game() {
 	let history = []
-	for (move of game.history({verbose: true})) {
+	for (let move of game.history({verbose: true})) {
 		history.push(move.from + move.to)
 	}
 
