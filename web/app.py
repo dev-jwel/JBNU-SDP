@@ -4,7 +4,7 @@ from flask import Flask, request, abort, render_template, redirect, current_app,
 from typing import List, Dict, Union, Optional
 from threading import Lock
 
-from logger.config import dictConfig
+from logging.config import dictConfig
 
 dictConfig({
 	'version': 1,

@@ -18,7 +18,7 @@ from chess_zero.agent.model_chess import ChessModel
 from chess_zero.lib.model_helper import load_best_model_weight
 from chess_zero.lib.logger import setup_logger
 
-from logger.config import dictConfig
+from logging.config import dictConfig
 
 dictConfig({
 	'version': 1,
