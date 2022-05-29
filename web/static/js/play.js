@@ -1,29 +1,137 @@
 import { Chess } from './chess.js'
 
 let game = new Chess()
+let selected_square = null
 let selected_square_button = null
+let is_predict_requested = false
 
-let color_black = "#eeeed2"
+let user_color = null
+let ai_color = null
+let mode = "easy"
+
+let color_black = "#EEEED2"
 let color_white = "#769656"
 let color_select = "#FFFF00"
+let color_legal = "#FF0000"
+let color_ai = "#0000FF"
 
-window.square_click_callback = function(square) {
+function initialze_game() {
+	if (Math.random() < 0.5) {
+		user_color = "black"
+		ai_color = "white"
+	} else {
+		user_color = "white"
+		ai_color = "black"
+	}
+
+	let css = user_color + "-user.css"
+	let head = document.getElementsByTagName("head")[0]
+	let link = document.createElement("link")
+	link.rel = "stylesheet"
+	link.href = "static/css/" + css
+	head.appendChild(link)
+
+	render_board()
+
+	if (ai_color == "white") {
+		ai_move(mode, true)
+	}
+}
+
+function render_board() {
+	for(const rank of ["1","2","3","4","5","6","7","8"]) {
+		for(const file of ["a", "b", "c", "d", "e", "f", "g", "h"]) {
+			let square = file + rank
+			let square_image = document.getElementById(square).children[0].children[0]
+			square_image.removeAttribute("src")
+			square_image.src = "/static/img/Empty.png"
+		}
+	}
+
+	for (let row of game.board()) {
+		for (let square of row) {
+			if (square === null) continue
+
+			let color = null
+			let piece = null
+
+			if (square.color === "b") {
+				color = "Black"
+			} else if (square.color === "w") {
+				color = "White"
+			}
+
+			if (square.type === "k") {
+				piece = "King"
+			} else if (square.type === "q") {
+				piece = "Queen"
+			} else if (square.type === "r") {
+				piece = "Rook"
+			} else if (square.type === "b") {
+				piece = "Bishop"
+			} else if (square.type === "n") {
+				piece = "Knight"
+			} else if (square.type === "p") {
+				piece = "Pawn"
+			}
+
+			let square_image = document.getElementById(square.square).children[0].children[0]
+			square_image.src = "/static/img/" + color + piece + ".png"
+		}
+	}
+}
+
+function square_click_callback(square) {
 	let square_button = document.getElementById(square).children[0]
 	if (square_button === null) {
 		return
 	}
 
-	if (selected_square_button === null) {
-		selected_square_button = square_button
-		change_color(square_button, color_select)
-	} else {
-		if (selected_square_button === square_button) {
+	if (is_predict_requested) {
+		return
+	}
+
+	// first select
+	if (selected_square === null) {
+		if (game.get(square) !== null) {
+			let legal_moves = game.moves({square: square, verbose: true})
+			if (legal_moves.length > 0) {
+				clear_color()
+				selected_square = square
+				selected_square_button = square_button
+				change_color(square_button, color_select)
+				for (const legal_move of legal_moves) {
+					let legal_square = legal_move.to
+					let legal_square_button = document.getElementById(legal_square).children[0]
+					change_color(legal_square_button, color_legal)
+				}
+			}
+		}
+	}
+
+	// deselect
+	else if (square_button === selected_square_button) {
+		selected_square = null
+		selected_square_button = null
+		clear_color()
+	}
+
+	// move
+	else {
+		let legal_squares = []
+		for (let legal_move of game.moves({square: selected_square, verbose: true})) {
+			legal_squares.push(legal_move.to)
+		}
+
+		if (legal_squares.includes(square)) {
+			// TODO: add promotion
+			game.move({from: selected_square, to: square}, {sloppy: true})
+			selected_square = null
 			selected_square_button = null
-			change_color(square_button, null)
-		} else {
-			change_color(selected_square_button, null)
-			selected_square_button = square_button
-			change_color(square_button, color_select)
+			clear_color()
+			render_board()
+			ai_move(mode, true)
+			render_board()
 		}
 	}
 
@@ -46,7 +154,17 @@ function change_color(square_button, color) {
 	square_button.style.backgroundColor = color
 }
 
-window.predict = function(mode, fen=game.fen(), on_success, on_error) {
+function clear_color() {
+	for(const rank of ["1","2","3","4","5","6","7","8"]) {
+		for(const file of ["a", "b", "c", "d", "e", "f", "g", "h"]) {
+			let square = file + rank
+			let button = document.getElementById(square).children[0]
+			change_color(button, null)
+		}
+	}
+}
+
+function predict(mode, fen, on_success, on_error, on_complete) {
 	$.ajax({
 		url: "/predict",
 		type: "POST",
@@ -55,181 +173,99 @@ window.predict = function(mode, fen=game.fen(), on_success, on_error) {
 			"mode": mode,
 			"fen": fen
 		},
-		success: function(res) {
-			console.log('res')
-			console.log(res)
-			on_success(res)
-		},
-		error: function(error) {
-			console.log('error')
-			console.log(error)
-			on_error()
-		},
+		success: on_success,
+		error: on_error,
+		complete: on_complete,
 		timeout: 60000
 	})
 }
 
-window.debug = function() {
-	console.log(game.board())
+function ai_move(mode, apply_move) {
+	if (is_predict_requested) {
+		return
+	}
+
+	document.getElementById("status").innerHTML = "requesting..."
+	is_predict_requested = true
+
+	predict (
+		mode,
+		game.fen(),
+		function (res) {
+			console.log(res)
+			let move = game.move(res["action"], {sloppy: true})
+			if (!apply_move) {
+				game.undo()
+			}
+
+			console.log(move)
+
+			render_board()
+			let from_square_button = document.getElementById(move.from).children[0]
+			let to_square_button = document.getElementById(move.to).children[0]
+			change_color(from_square_button, color_ai)
+			change_color(to_square_button, color_ai)
+		},
+		function (error) {
+			alert('failed to request')
+		},
+		function () {
+			document.getElementById("status").innerHTML = "your turn"
+			is_predict_requested = false
+		}
+	)
 }
 
-for (let row of game.board()) {
-	for (let square of row) {
-		if (square === null) continue
+function change_mode() {
+	if (mode === "easy") {
+		mode = "hard"
+	} else {
+		mode = "easy"
+	}
 
-		let color = null
-		let piece = null
+	document.getElementById("mode").innerHTML = mode
+}
 
-		if (square.color === "b") {
-			color = "Black"
-		} else if (square.color === "w") {
-			color = "White"
-		}
+function hint() {
+	if (is_predict_requested) {
+		return
+	}
+	selected_square = null
+	selected_square_button = null
+	clear_color()
+	ai_move("hard", false)
+}
 
-		if (square.type === "k") {
-			piece = "King"
-		} else if (square.type === "q") {
-			piece = "Queen"
-		} else if (square.type === "r") {
-			piece = "Rook"
-		} else if (square.type === "b") {
-			piece = "Bishop"
-		} else if (square.type === "n") {
-			piece = "Knight"
-		} else if (square.type === "p") {
-			piece = "Pawn"
-		}
-
-		let square_image = document.getElementById(square.square).children[0].children[0]
-		square_image.src = "/static/img/" + color + piece + ".png"
+function undo() {
+	if (is_predict_requested) {
+		return
+	}
+	if (game.history().length >= 2) {
+		game.undo()
+		game.undo()
+		render_board()
+		clear_color()
 	}
 }
+
+window.initialze_game = initialze_game
+window.square_click_callback = square_click_callback
+window.change_mode = change_mode
+window.hint = hint
+window.undo = undo
+
+// DEBUG
+window.predict = predict
+window.game = game
+window.selected_square = selected_square
+window.selected_square_button = selected_square_button
+window.is_predict_requested = is_predict_requested
+
+window.user_color = user_color
+window.ai_color = ai_color
+window.mode = mode
 
 /*
-class WebServerWraper {
-	constructor(host, port) {
-		this.url = "http://" + host + ":" + port
-	}
-
-	add_history(mode, user_color, history) {
-		ret = null
-		$.ajax({
-			url: this.url + "/add_history",
-			type: "POST",
-			datatype: "json",
-			data: {
-				"mode": mode,
-				"user_color": user_color,
-				history: history
-			},
-			success: function(res) {
-				ret = JSON.parse(res)
-			},
-			error: function(error) {}
-		})
-		return ret
-	}
-}
-
-class Game {
-	constructor(mode, user_color) {
-		this.mode = mode
-		this.user_color = user_color
-		this.board = new Chess()
-		this.web_server = WebServerWraper(HOST, PORT)
-
-		if(user_color == "black") {
-			move = this.web_server.predict(this.mode, this.board.fen())
-			this.board.make_move(move)
-		}
-	}
-
-	has_piece(square) {
-		return this.board.get(square) !== null
-	}
-
-	make_move(move) {
-		this.board.make_move(move)
-		move = this.web_server.predict(this.mode, this.board.fen())
-		this.board.make_move(move)
-	}
-
-	get_legal_moves(square) {
-		return this.board.moves({square: square})
-	}
-
-	undo() {
-		this.board.undo()
-		this.board.undo()
-	}
-
-	get_hint() {
-		return this.web_server.predict(this.mode, this.board.fen())
-	}
-}
-
-class GameClickHandler {
-	constructor(mode, user_color) {
-		this.game = Game(mode, user_color)
-		this.selected_square = null
-	}
-
-	clear_color() {
-		for(var rank of [1,2,3,4,5,6,7,8]) {
-			for(var file in 'abcdefgh') {
-				SquareRenderer.change_color(SquareRenderer.DEFAULT, file+rank)
-			}
-		}
-	}
-
-	board_click_callback(square) {
-		if(!this.game.has_piece(square)) {
-			return
-		}
-
-		this.clear_color()
-
-		if(this.selected_square !== square) {
-			for(var legal_square of this.game.get_legal_moves(square)) {
-				SquareRenderer.change_color(SquareRenderer.LEGAL_MOVE, legal_square)
-			}
-
-			SquareRenderer.change_color(SquareRenderer.SELECTED, legal_square)
-			this.selected_square = square
-		} else {
-			this.selected_square = null
-		}
-	}
-
-	hint_click_callback() {
-		this.selected_square = null
-		this.clear_color()
-		hint = this.game.get_hint()
-		move = chess.move(hint)
-		SquareRenderer.change_color(SquareRenderer.SUGGESTION, move.from)
-		SquareRenderer.change_color(SquareRenderer.SUGGESTION, move.to)
-	}
-
-	undo_click_callback() {
-		this.selected_square = null
-		this.clear_color()
-		this.game.undo()
-	}
-}
-
-class SquareRenderer {
-	static DEFAULT = "#??????"
-	static SELECTED = "#??????"
-	static LEGAL_MOVE = "#??????"
-	static SUGGESTION = "#??????"
-
-	static change_color(color, square) {
-		// TODO
-		// select dom object using square
-		// set object's color
-	}
-}
-
 class OptionSelector {
 	static select_option(title, options, callbacks) {
 		// TODO

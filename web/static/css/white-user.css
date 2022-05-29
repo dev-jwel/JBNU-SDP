@@ -1,0 +1,319 @@
+#a1 {
+	grid-column: 1;
+	grid-row: 8;
+}
+
+#a2 {
+	grid-column: 1;
+	grid-row: 7;
+}
+
+#a3 {
+	grid-column: 1;
+	grid-row: 6;
+}
+
+#a4 {
+	grid-column: 1;
+	grid-row: 5;
+}
+
+#a5 {
+	grid-column: 1;
+	grid-row: 4;
+}
+
+#a6 {
+	grid-column: 1;
+	grid-row: 3;
+}
+
+#a7 {
+	grid-column: 1;
+	grid-row: 2;
+}
+
+#a8 {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+#b1 {
+	grid-column: 2;
+	grid-row: 8;
+}
+
+#b2 {
+	grid-column: 2;
+	grid-row: 7;
+}
+
+#b3 {
+	grid-column: 2;
+	grid-row: 6;
+}
+
+#b4 {
+	grid-column: 2;
+	grid-row: 5;
+}
+
+#b5 {
+	grid-column: 2;
+	grid-row: 4;
+}
+
+#b6 {
+	grid-column: 2;
+	grid-row: 3;
+}
+
+#b7 {
+	grid-column: 2;
+	grid-row: 2;
+}
+
+#b8 {
+	grid-column: 2;
+	grid-row: 1;
+}
+
+#c1 {
+	grid-column: 3;
+	grid-row: 8;
+}
+
+#c2 {
+	grid-column: 3;
+	grid-row: 7;
+}
+
+#c3 {
+	grid-column: 3;
+	grid-row: 6;
+}
+
+#c4 {
+	grid-column: 3;
+	grid-row: 5;
+}
+
+#c5 {
+	grid-column: 3;
+	grid-row: 4;
+}
+
+#c6 {
+	grid-column: 3;
+	grid-row: 3;
+}
+
+#c7 {
+	grid-column: 3;
+	grid-row: 2;
+}
+
+#c8 {
+	grid-column: 3;
+	grid-row: 1;
+}
+
+#d1 {
+	grid-column: 4;
+	grid-row: 8;
+}
+
+#d2 {
+	grid-column: 4;
+	grid-row: 7;
+}
+
+#d3 {
+	grid-column: 4;
+	grid-row: 6;
+}
+
+#d4 {
+	grid-column: 4;
+	grid-row: 5;
+}
+
+#d5 {
+	grid-column: 4;
+	grid-row: 4;
+}
+
+#d6 {
+	grid-column: 4;
+	grid-row: 3;
+}
+
+#d7 {
+	grid-column: 4;
+	grid-row: 2;
+}
+
+#d8 {
+	grid-column: 4;
+	grid-row: 1;
+}
+
+#e1 {
+	grid-column: 5;
+	grid-row: 8;
+}
+
+#e2 {
+	grid-column: 5;
+	grid-row: 7;
+}
+
+#e3 {
+	grid-column: 5;
+	grid-row: 6;
+}
+
+#e4 {
+	grid-column: 5;
+	grid-row: 5;
+}
+
+#e5 {
+	grid-column: 5;
+	grid-row: 4;
+}
+
+#e6 {
+	grid-column: 5;
+	grid-row: 3;
+}
+
+#e7 {
+	grid-column: 5;
+	grid-row: 2;
+}
+
+#e8 {
+	grid-column: 5;
+	grid-row: 1;
+}
+
+#f1 {
+	grid-column: 6;
+	grid-row: 8;
+}
+
+#f2 {
+	grid-column: 6;
+	grid-row: 7;
+}
+
+#f3 {
+	grid-column: 6;
+	grid-row: 6;
+}
+
+#f4 {
+	grid-column: 6;
+	grid-row: 5;
+}
+
+#f5 {
+	grid-column: 6;
+	grid-row: 4;
+}
+
+#f6 {
+	grid-column: 6;
+	grid-row: 3;
+}
+
+#f7 {
+	grid-column: 6;
+	grid-row: 2;
+}
+
+#f8 {
+	grid-column: 6;
+	grid-row: 1;
+}
+
+#g1 {
+	grid-column: 7;
+	grid-row: 8;
+}
+
+#g2 {
+	grid-column: 7;
+	grid-row: 7;
+}
+
+#g3 {
+	grid-column: 7;
+	grid-row: 6;
+}
+
+#g4 {
+	grid-column: 7;
+	grid-row: 5;
+}
+
+#g5 {
+	grid-column: 7;
+	grid-row: 4;
+}
+
+#g6 {
+	grid-column: 7;
+	grid-row: 3;
+}
+
+#g7 {
+	grid-column: 7;
+	grid-row: 2;
+}
+
+#g8 {
+	grid-column: 7;
+	grid-row: 1;
+}
+
+#h1 {
+	grid-column: 8;
+	grid-row: 8;
+}
+
+#h2 {
+	grid-column: 8;
+	grid-row: 7;
+}
+
+#h3 {
+	grid-column: 8;
+	grid-row: 6;
+}
+
+#h4 {
+	grid-column: 8;
+	grid-row: 5;
+}
+
+#h5 {
+	grid-column: 8;
+	grid-row: 4;
+}
+
+#h6 {
+	grid-column: 8;
+	grid-row: 3;
+}
+
+#h7 {
+	grid-column: 8;
+	grid-row: 2;
+}
+
+#h8 {
+	grid-column: 8;
+	grid-row: 1;
+}
