@@ -10,7 +10,10 @@ fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 def test(url, num_request=10, timeout=60):
 	reqs = [
 		grequests.post(
-			url+'/easy', headers={'Content-Type': 'application/json'}, data=json.dumps({'fen':fen}), timeout=timeout
+			url+'/easy',
+			headers={'Content-Type': 'application/json'},
+			data=json.dumps({'fen':fen}),
+			timeout=timeout
 		)
 		for _ in range(num_request)
 	]
