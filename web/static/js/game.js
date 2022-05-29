@@ -339,29 +339,3 @@ window.change_mode = change_mode
 window.render_board = render_board
 window.hint = hint
 window.undo = undo
-
-// DEBUG
-window.predict = predict
-window.finish_game = finish_game
-window.selected_square = selected_square
-window.selected_square_button = selected_square_button
-window.is_predict_requested = is_predict_requested
-window.ai_move = ai_move
-
-window.user_color = user_color
-window.ai_color = ai_color
-window.mode = mode
-window.auto = auto
-
-/*
-class OptionSelector {
-	static select_option(title, options, callbacks) {
-		// TODO
-		// create new div object
-		// add title into object
-		// add options with click callback
-		// add popup close callback
-		// append object into document
-	}
-}
-*/

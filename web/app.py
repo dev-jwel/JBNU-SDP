@@ -134,20 +134,6 @@ def get_message():
 
 	return message
 
-#############
-# TEST ONLY #
-#############
-@app.route('/uid', methods=['GET'])
-def uid():
-	return str(session.get('uid', -1))
-
-#############
-# TEST ONLY #
-#############
-@app.route('/history-debug', methods=['GET'])
-def history_debug():
-	return render_template('history-debug.html', message=get_message(), uid=session.get('uid', -1))
-
 @app.route('/', methods=['GET'])
 def root():
 	return redirect('/index')
@@ -236,14 +222,8 @@ def register():
 
 	return redirect('/login')
 
-###########################
-# GET METHOD IS TEST ONLY #
-###########################
-@app.route('/predict', methods=['GET', 'POST'])
+@app.route('/predict', methods=['POST'])
 def predict():
-	if request.method == 'GET':
-		return render_template('predict.html', message=get_message(), uid=session.get('uid', -1))
-
 	mode = request.form['mode']
 	fen = request.form['fen']
 
