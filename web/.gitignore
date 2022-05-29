@@ -9,6 +9,9 @@ pyvenv.cfg
 # pycache
 __pycache__/
 
+# log file for flask
+log.txt
+
 # sqlite3 database file
 db.db
 

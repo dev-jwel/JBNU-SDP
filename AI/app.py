@@ -18,6 +18,30 @@ from chess_zero.agent.model_chess import ChessModel
 from chess_zero.lib.model_helper import load_best_model_weight
 from chess_zero.lib.logger import setup_logger
 
+from logger.config import dictConfig
+
+dictConfig({
+	'version': 1,
+	'formatters': { 'default': {
+		'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+	}},
+	'handlers': {
+		'wsgi': {
+			'class': 'logging.StreamHandler',
+			'stream': 'ext://flask.logging.wsgi_errors_stream',
+			'formatter': 'default'
+		},
+		'local_file': {
+			'class': 'logging.FileHandler',
+			'filename': 'log.txt'
+		}
+	},
+	'root': {
+		'level': 'INFO',
+		'handlers': ['wsgi', 'local_file']
+	}
+})
+
 MODES = ['easy', 'hard']
 
 config = Config(config_type='normal')
