@@ -128,6 +128,7 @@ function square_click_callback(square) {
 			game.move({from: selected_square, to: square}, {sloppy: true})
 			if (game.game_over()) {
 				finish_game()
+				return
 			}
 
 			selected_square = null
@@ -138,6 +139,7 @@ function square_click_callback(square) {
 			ai_move(mode, true)
 			if (game.game_over()) {
 				finish_game()
+				return
 			}
 
 			render_board()
