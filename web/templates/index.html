@@ -3,55 +3,76 @@
 
 	<head>
 		<meta charset="UTF-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>{% block title %}Welcome to web chess arena!{% endblock %}</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 		<link rel="icon" type="image/jpg" href="{{ url_for('static', filename='img/favicon.jpg') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+{% block css %}
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
 {% block head %}{% endblock %}
 	</head>
 
 	<body>
-		<div style="display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr 9fr; width: 100%; height: 100%;">
-			<div style="grid-column: 1; grid-row: 1; display: grid; grid-template-columns: 1fr 1fr 14fr 4fr; grid-template-rows: 1fr; width: 100%; height: 100%;">
-				<div style="grid-column: 1; grid-row: 1;">
-					<a href="https://github.com/dev-jwel/JBNU-SDP"><img src="{{ url_for('static', filename='img/GitHub.png') }}"></a>
-				</div>
-
-				<div style="grid-column: 2; grid-row: 1;">
-					<button type="button" style="width: 100%; height: 100%;" onclick="location.href='/'"><p>home</p></button>
-				</div>
-
-				<div style="text-align: center; grid-column: 3; grid-row: 1;">
-					<p>{{ message }}</p>
-				</div>
-
-				<div style="grid-column: 4; grid-row: 1;">
-{% if uid != -1 %}
-					<button type="button" style="width: 100%; height: 100%;" onclick="location.href='logout'"><p>logout</p></button>
-{% endif %}
-				</div>
-			</div>
-
 {% block body %}
-			<div style="grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 1fr; grid-template-rows: 2fr 7fr 2fr 7fr 2fr; width: 100%; height: 100%;">
-				<div style="grid-column: 1; grid-row: 1;"></div>
-				<div style="text-align: center; grid-column: 1; grid-row: 2;">
-	{% if uid != -1 %}
-					<button type="button" style="width: 75%; height: 100%;" onclick="location.href='history-page'"><p>history</p></button>
-	{% else %}
-					<button type="button" style="width: 75%; height: 100%;" onclick="location.href='login'"><p>login</p></button>
-	{% endif %}
+		<div class="d-flex justify-content-center align-items-center mt-5">
+			<div class="card">
+				<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+					<li class="nav-item text-center">
+						<a class="nav-link active btl" id="pills-home-tab" data-toggle="pill" data-bs-toggle="pill" data-bs-target="#pills-home" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Login</a>
+					</li>
+					<li class="nav-item text-center">
+						<a class="nav-link btr" id="pills-profile-tab" data-toggle="pill" data-bs-toggle="pill" data-bs-target="#pills-profile" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Signup</a>
+					</li>
+				</ul>
+
+				<div class="tab-content" id="pills-tabContent">
+					<div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+						<div class="form px-4 pt-5">
+							<form method="POST" action="login">
+								<input type="text" name="name" class="form-control" placeholder="ID">
+								<input type="password" name="pw" class="form-control" placeholder="PW">
+								<div class="d-flex justify-content-around">
+									<div class="item"><button class="btn option-color" type="submit">Login</button></div>
+									<div class="item"><button class="btn option-color" type="button" onclick="location.href='play'">Play Now</button></div>
+								</div>
+								<div class="d-flex justify-content-center">
+									<a href="https://github.com/dev-jwel/JBNU-SDP"><img src="{{ url_for('static', filename='img/GitHub.png') }}"></a>
+								</div>
+								<div class="d-flex justify-content-center">
+									<p style="color:red;">{{ message }}</p>
+								</div>
+							</form>
+						</div>
+					</div>
+
+					<div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+						<div class="form px-4 pt-5" >
+							<form method="POST" action="signup">
+								<input type="text" name="name" class="form-control" placeholder="ID">
+								<input type="password" name="pw" class="form-control" placeholder="PW">
+								<div class="d-flex justify-content-around">
+									<div class="item"><button class="btn option-color" type="submit">Signup</button></div>
+									<div class="item"><button class="btn option-color" type="button" onclick="location.href='play'">Play Now</button></div>
+								</div>
+								<div class="d-flex justify-content-center">
+									<a href="https://github.com/dev-jwel/JBNU-SDP"><img src="{{ url_for('static', filename='img/GitHub.png') }}"></a>
+								</div>
+								<div class="d-flex justify-content-center">
+									<p style="color:red;">{{ message }}</p>
+								</div>
+							</form>
+						</div>
+					</div>
 				</div>
-				<div style="grid-column: 1; grid-row: 3;"></div>
-				<div style="text-align: center; grid-column: 1; grid-row: 4;">
-					<button type="button" style="width: 75%; height: 100%;" onclick="location.href='play'"><p>play now</p></button>
-				</div>
-				<div style="grid-column: 1; grid-row: 5;"></div>
 			</div>
+		</div>
 {% endblock %}
 
-		</div>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+		{% block script %}{% endblock %}
 	</body>
-
 </html>

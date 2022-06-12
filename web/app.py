@@ -130,6 +130,13 @@ class DBWraper:
 
 		return histories
 
+	def num_histories(self, uid: int) -> int:
+		query = "SELECT COUNT(*) from History WHERE black=? OR white=?"
+		with self.lock:
+			self.cursor.execute(query, (uid, uid))
+			row = self.cursor.fetchone()
+		return row["COUNT(*)"]
+
 	def add_history(self, black: int, white: int, history: str) -> bool:
 		query = "INSERT INTO History(black, white, history, timestamp) VALUES (?, ?, ?, ?)"
 		try:
@@ -158,10 +165,6 @@ app.secret_key = ''.join([random.choice(chars) for _ in range(16)])
 def get_message():
 	message = ''
 
-	name = session.get('name', None)
-	if name is not None:
-		message = 'hello {}'.format(name)
-
 	session_message = session.pop('message', None)
 	if session_message is not None:
 		message = session_message
@@ -174,60 +177,76 @@ def root():
 
 @app.route('/index', methods=['GET'])
 def index():
-	return render_template('index.html', message=get_message(), uid=session.get('uid', -1))
+	if session.get('uid', -1) == -1:
+		return render_template('index.html', message=get_message())
+	else:
+		return redirect('/home')
 
 @app.route('/play', methods=['GET'])
 def play():
-	return render_template('play.html', message=get_message(), uid=session.get('uid', -1))
+	return render_template('play.html', view=random.choice(['black', 'white']), uid=session.get('uid', -1))
 
-@app.route('/history-page', methods=['GET'])
-def history_page():
-	if session.get('uid', -1) == -1:
-		abort(400, 'login first')
+@app.route('/home', methods=['GET'])
+def home():
+	uid = session.get('uid', -1)
+	if uid == -1:
+		session['message'] = 'login first'
+		return redirect('/index')
+
+	name = current_app.db.get_user_name(uid)
+
+	num_page = (current_app.db.num_histories(uid) -1) // 10 + 1
+	num_page = max(1, num_page)
 
 	page = request.args.get('page', 1)
+	page = min(max(1, page), num_page)
+
 	limit_start = 10 * (page-1)
 	limit_end = 10 * page
+	histories = current_app.db.get_histories(uid, limit_start, limit_end)
 
-	histories = current_app.db.get_histories(session['uid'], limit_start, limit_end)
 	return render_template(
-		'history-page.html',
-		message=get_message(),
-		uid=session.get('uid', -1),
-		name=session.get('name', None),
+		'home.html',
+		name=name,
 		histories=histories,
-		num_page=page
+		page=page,
+		num_page=num_page
 	)
 
-@app.route('/history-game', methods=['GET'])
-def history_game():
+@app.route('/history', methods=['GET'])
+def history():
 	history_id = request.args.get('id')
-	view = request.args.get('view')
+	view = request.args.get('view', 'white')
 
 	history = current_app.db.get_history(history_id)
 	if history == None:
 		return abort(404, "no such history")
 	history = history.split(',')
 
-	return render_template(
-		'history-game.html',
-		message=get_message(),
-		uid=session.get('uid', -1),
-		history=history,
-		view=view
-	)
+	return render_template('history.html', history=history, view=view)
 
-@app.route('/logout', methods=['GET', 'POST'])
+@app.route('/logout', methods=['GET'])
 def logout():
 	session.pop('uid', None)
 	session.pop('name', None)
 	return redirect('/index')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-	if request.method == 'GET':
-		return render_template('login.html', message=get_message(), uid=session.get('uid', -1))
+@app.route('/signup', methods=['POST'])
+def signup():
+	name = request.form['name']
+	pw = request.form['pw']
 
+	if current_app.db.add_user(name, pw):
+		uid = current_app.db.get_uid(name, pw)
+		session['uid'] = uid
+		session['name'] = name
+	else:
+		session['message'] = 'failed to register'
+
+	return redirect('/index')
+
+@app.route('/login', methods=['POST'])
+def login():
 	name = request.form['name']
 	pw = request.form['pw']
 
@@ -240,21 +259,6 @@ def login():
 		session['message'] = 'login failed'
 
 	return redirect('/index')
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-	if request.method == 'GET':
-		return render_template('register.html', message=get_message(), uid=session.get('uid', -1))
-
-	name = request.form['name']
-	pw = request.form['pw']
-
-	if current_app.db.add_user(name, pw):
-		session['message'] = 'registered'
-	else:
-		session['message'] = 'failed to register'
-
-	return redirect('/login')
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -297,7 +301,7 @@ def add_history():
 		is_valid = False
 
 	if not is_valid:
-		return(400, 'wrong history')
+		return abort(400, 'wrong history')
 
 	if current_app.db.add_history(black, white, history):
 		return 'success'

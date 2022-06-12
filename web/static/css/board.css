@@ -1,32 +1,18 @@
-.play-pane {
-	height: 100%;
-	width: 100%;
-	display: grid;
-	grid-template-rows: 1fr;
-	grid-template-columns: 7fr 3fr;
+.black-piece-box {
+	background-color: #00000080;
 }
 
-.chess-board-pane {
-	height: 100%;
-	grid-row: 1;
-	grid-column: 1;
-	display: grid;
-	grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-	grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+.white-piece-box {
+	background-color: #FFFFFF80;
 }
 
-.chess-board-pane:after {
-	padding-bottom: 100%;
-}
-
-.black-button {
+.btn {
 	width: 100%;
 	height: 100%;
-	background-color: #eeeed2;
+	background-size: cover;
 }
 
-.white-button {
-	width: 100%;
-	height: 100%;
-	background-color: #769656;
+.img {
+	max-width: 100% !important;
+	aspect-ratio: 1 / 1 !important;
 }

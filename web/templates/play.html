@@ -4,247 +4,325 @@
 
 {% block head %}
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/board.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/play.css') }}">
 {% endblock %}
 
 {% block body %}
-	<div class="play-pane">
-		<div class="chess-board-pane">
-			<div id="a8" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('a8')"><img></button>
-			</div>
-			<div id="b8" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('b8')"><img></button>
-			</div>
-			<div id="c8" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('c8')"><img></button>
-			</div>
-			<div id="d8" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('d8')"><img></button>
-			</div>
-			<div id="e8" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('e8')"><img></button>
-			</div>
-			<div id="f8" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('f8')"><img></button>
-			</div>
-			<div id="g8" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('g8')"><img></button>
-			</div>
-			<div id="h8" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('h8')"><img></button>
+	<div class="row">
+		<div class="d-flex justify-content-center align-items-center">
+			<div class="col-8">
+				<div class="row">
+	{% set square = 'a8' if view == 'white' else 'h1' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'b8' if view == 'white' else 'g1' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'c8' if view == 'white' else 'f1' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'd8' if view == 'white' else 'e1' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'e8' if view == 'white' else 'd1' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'f8' if view == 'white' else 'c1' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'g8' if view == 'white' else 'b1' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'h8' if view == 'white' else 'a1' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+				</div>
+
+				<div class="row">
+	{% set square = 'a7' if view == 'white' else 'h2' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'b7' if view == 'white' else 'g2' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'c7' if view == 'white' else 'f2' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'd7' if view == 'white' else 'e2' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'e7' if view == 'white' else 'd2' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'f7' if view == 'white' else 'c2' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'g7' if view == 'white' else 'b2' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'h7' if view == 'white' else 'a2' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+				</div>
+
+				<div class="row">
+	{% set square = 'a6' if view == 'white' else 'h3' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'b6' if view == 'white' else 'g3' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'c6' if view == 'white' else 'f3' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'd6' if view == 'white' else 'e3' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'e6' if view == 'white' else 'd3' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'f6' if view == 'white' else 'c3' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'g6' if view == 'white' else 'b3' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'h6' if view == 'white' else 'a3' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+				</div>
+
+				<div class="row">
+	{% set square = 'a5' if view == 'white' else 'h4' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'b5' if view == 'white' else 'g4' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'c5' if view == 'white' else 'f4' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'd5' if view == 'white' else 'e4' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'e5' if view == 'white' else 'd4' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'f5' if view == 'white' else 'c4' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'g5' if view == 'white' else 'b4' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'h5' if view == 'white' else 'a4' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+				</div>
+
+				<div class="row">
+	{% set square = 'a4' if view == 'white' else 'h5' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'b4' if view == 'white' else 'g5' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'c4' if view == 'white' else 'f5' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'd4' if view == 'white' else 'e5' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'e4' if view == 'white' else 'd5' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'f4' if view == 'white' else 'c5' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'g4' if view == 'white' else 'b5' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'h4' if view == 'white' else 'a5' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+				</div>
+
+				<div class="row">
+	{% set square = 'a3' if view == 'white' else 'h6' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'b3' if view == 'white' else 'g6' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'c3' if view == 'white' else 'f6' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'd3' if view == 'white' else 'e6' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'e3' if view == 'white' else 'd6' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'f3' if view == 'white' else 'c6' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'g3' if view == 'white' else 'b6' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'h3' if view == 'white' else 'a6' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+				</div>
+
+				<div class="row">
+	{% set square = 'a2' if view == 'white' else 'h7' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'b2' if view == 'white' else 'g7' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'c2' if view == 'white' else 'f7' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'd2' if view == 'white' else 'e7' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'e2' if view == 'white' else 'd7' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'f2' if view == 'white' else 'c7' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'g2' if view == 'white' else 'b7' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'h2' if view == 'white' else 'a7' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+				</div>
+
+				<div class="row">
+	{% set square = 'a1' if view == 'white' else 'h8' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'b1' if view == 'white' else 'g8' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'c1' if view == 'white' else 'f8' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'd1' if view == 'white' else 'e8' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'e1' if view == 'white' else 'd8' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'f1' if view == 'white' else 'c8' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'g1' if view == 'white' else 'b8' %}
+					<div id="{{ square }}" class="black-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+	{% set square = 'h1' if view == 'white' else 'a8' %}
+					<div id="{{ square }}" class="white-piece-box col ratio ratio-1x1">
+						<button type="button" class="btn" onclick="square_click_callback('{{ square }}')"><img class="img-fluid"></button>
+					</div>
+				</div>
 			</div>
 
-			<div id="a7" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('a7')"><img></button>
-			</div>
-			<div id="b7" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('b7')"><img></button>
-			</div>
-			<div id="c7" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('c7')"><img></button>
-			</div>
-			<div id="d7" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('d7')"><img></button>
-			</div>
-			<div id="e7" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('e7')"><img></button>
-			</div>
-			<div id="f7" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('f7')"><img></button>
-			</div>
-			<div id="g7" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('g7')"><img></button>
-			</div>
-			<div id="h7" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('h7')"><img></button>
-			</div>
-
-			<div id="a6" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('a6')"><img></button>
-			</div>
-			<div id="b6" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('b6')"><img></button>
-			</div>
-			<div id="c6" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('c6')"><img></button>
-			</div>
-			<div id="d6" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('d6')"><img></button>
-			</div>
-			<div id="e6" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('e6')"><img></button>
-			</div>
-			<div id="f6" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('f6')"><img></button>
-			</div>
-			<div id="g6" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('g6')"><img></button>
-			</div>
-			<div id="h6" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('h6')"><img></button>
-			</div>
-
-			<div id="a5" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('a5')"><img></button>
-			</div>
-			<div id="b5" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('b5')"><img></button>
-			</div>
-			<div id="c5" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('c5')"><img></button>
-			</div>
-			<div id="d5" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('d5')"><img></button>
-			</div>
-			<div id="e5" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('e5')"><img></button>
-			</div>
-			<div id="f5" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('f5')"><img></button>
-			</div>
-			<div id="g5" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('g5')"><img></button>
-			</div>
-			<div id="h5" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('h5')"><img></button>
-			</div>
-
-			<div id="a4" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('a4')"><img></button>
-			</div>
-			<div id="b4" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('b4')"><img></button>
-			</div>
-			<div id="c4" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('c4')"><img></button>
-			</div>
-			<div id="d4" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('d4')"><img></button>
-			</div>
-			<div id="e4" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('e4')"><img></button>
-			</div>
-			<div id="f4" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('f4')"><img></button>
-			</div>
-			<div id="g4" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('g4')"><img></button>
-			</div>
-			<div id="h4" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('h4')"><img></button>
-			</div>
-
-			<div id="a3" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('a3')"><img></button>
-			</div>
-			<div id="b3" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('b3')"><img></button>
-			</div>
-			<div id="c3" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('c3')"><img></button>
-			</div>
-			<div id="d3" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('d3')"><img></button>
-			</div>
-			<div id="e3" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('e3')"><img></button>
-			</div>
-			<div id="f3" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('f3')"><img></button>
-			</div>
-			<div id="g3" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('g3')"><img></button>
-			</div>
-			<div id="h3" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('h3')"><img></button>
-			</div>
-
-			<div id="a2" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('a2')"><img></button>
-			</div>
-			<div id="b2" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('b2')"><img></button>
-			</div>
-			<div id="c2" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('c2')"><img></button>
-			</div>
-			<div id="d2" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('d2')"><img></button>
-			</div>
-			<div id="e2" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('e2')"><img></button>
-			</div>
-			<div id="f2" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('f2')"><img></button>
-			</div>
-			<div id="g2" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('g2')"><img></button>
-			</div>
-			<div id="h2" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('h2')"><img></button>
-			</div>
-
-			<div id="a1" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('a1')"><img></button>
-			</div>
-			<div id="b1" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('b1')"><img></button>
-			</div>
-			<div id="c1" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('c1')"><img></button>
-			</div>
-			<div id="d1" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('d1')"><img></button>
-			</div>
-			<div id="e1" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('e1')"><img></button>
-			</div>
-			<div id="f1" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('f1')"><img></button>
-			</div>
-			<div id="g1" class="piece-box">
-				<button type="button" class="black-button" onclick="square_click_callback('g1')"><img></button>
-			</div>
-			<div id="h1" class="piece-box">
-				<button type="button" class="white-button" onclick="square_click_callback('h1')"><img></button>
-			</div>
-		</div>
-
-		<div class="control-pane">
+			<div class="col-4">
+				<div class="d-flex justify-content-center align-items-center">
+					<div class="card text-center">
 	{% block control_pane %}
-			<div class="status-pane">
-				<p id="status">your turn</p>
-			</div>
-			<div class="mode-pane">
-				<button type="button" style="width: 100%; height: 100%;" onclick="change_mode()">
-					<p id="mode">easy</p>
-				</button>
-			</div>
-			<div class="hint-pane">
-				<button type="button" style="width: 100%; height: 100%;" onclick="hint()">
-					<p>hint</p>
-				</button>
-			</div>
-			<div class="undo-pane">
-				<button type="button" style="width: 100%; height: 100%;" onclick="undo()">
-					<p>undo</p>
-				</button>
-			</div>
+						<p id="status" class="option-color">your turn</p>
+						<button type="button" class="btn option-color list-group-item list-group-item-action" onclick="change_mode()">
+							<p id="mode">easy</p>
+						</button>
+						<button type="button" class="btn option-color list-group-item list-group-item-action" onclick="hint()">
+							<p>hint</p>
+						</button>
+						<button type="button" class="btn option-color list-group-item list-group-item-action" onclick="undo()">
+							<p>undo</p>
+						</button>
 	{% endblock %}
+						<div class="d-flex justify-content-evenly">
+							<a href="/"><img src="{{ url_for('static', filename='img/Home.png') }}"></a>
+							<a href="https://github.com/dev-jwel/JBNU-SDP"><img src="{{ url_for('static', filename='img/GitHub.png') }}"></a>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 
-	{% block script %}
+	{# script below will be inherited by history #}
 	<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 	<script src="{{ url_for('static', filename='js/game.js') }}" type="module"></script>
+{% endblock %}
 
-		{% if uid == -1 %}
-	<script>anonymous = true</script>
-		{% else %}
-	<script>anonymous = false</script>
-		{% endif %}
-
+{% block script %}
+	<script>let anonymous = {{ 'true' if uid == -1 else 'false'}}</script>
+	<script>let player_color = "{{ view }}"</script>
 	<script>window.onload = function () {initialze_game()}</script>
-	{% endblock %}
 {% endblock %}

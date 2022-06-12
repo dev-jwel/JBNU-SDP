@@ -5,41 +5,22 @@ let selected_square = null
 let selected_square_button = null
 let is_predict_requested = false
 
-let user_color = null
-let ai_color = null
 let mode = "easy"
 
-let color_black = "#EEEED2"
-let color_white = "#769656"
-let color_select = "#FFFF00"
-let color_legal = "#FF0000"
-let color_ai = "#0000FF"
+let color_select = "#FFFF0080"
+let color_legal = "#FF000080"
+let color_ai = "#0000FF80"
+let color_empty = "#00000000"
 
 function initialze_game() {
-	if (Math.random() < 0.5) {
-		user_color = "black"
-		ai_color = "white"
-	} else {
-		user_color = "white"
-		ai_color = "black"
-	}
-
-	let css = user_color + "-user.css"
-	let head = document.getElementsByTagName("head")[0]
-	let link = document.createElement("link")
-	link.rel = "stylesheet"
-	link.href = "static/css/" + css
-	head.appendChild(link)
-
 	render_board()
-
-	if (ai_color == "white") {
+	if (player_color == "black") {
 		ai_move(mode, true)
 	}
 }
 
 function render_board() {
-	for(const rank of ["1","2","3","4","5","6","7","8"]) {
+	for(const rank of ["1", "2", "3", "4", "5", "6", "7", "8"]) {
 		for(const file of ["a", "b", "c", "d", "e", "f", "g", "h"]) {
 			let square = file + rank
 			let square_image = document.getElementById(square).children[0].children[0]
@@ -137,11 +118,6 @@ function square_click_callback(square) {
 			render_board()
 
 			ai_move(mode, true)
-			if (game.game_over()) {
-				finish_game()
-				return
-			}
-
 			render_board()
 		}
 	}
@@ -154,13 +130,7 @@ function change_color(square_button, color) {
 	}
 
 	if (color === null) {
-		if (square_button.classList.contains("black-button")) {
-			color = color_black
-		} else if (square_button.classList.contains("white-button")) {
-			color = color_white
-		} else {
-			return
-		}
+		color = color_empty
 	}
 	square_button.style.backgroundColor = color
 }
@@ -216,6 +186,10 @@ function ai_move(mode, apply_move) {
 			let to_square_button = document.getElementById(move.to).children[0]
 			change_color(from_square_button, color_ai)
 			change_color(to_square_button, color_ai)
+
+			if (game.game_over()) {
+				setTimeout(() => finish_game(), 1000);
+			}
 		},
 		function (error) {
 			alert('failed to request')
@@ -240,7 +214,7 @@ function finish_game() {
 			datatype: "json",
 			data: {
 				"mode": mode,
-				"player-color": user_color,
+				"player-color": player_color,
 				"history": history.join(',')
 			},
 			error: function (error) {
@@ -251,11 +225,7 @@ function finish_game() {
 
 	alert("game over!")
 
-	if (!anonymous) {
-		location.href = "/history-page"
-	} else {
-		location.href = "/"
-	}
+	location.href = "/"
 }
 
 function change_mode() {
@@ -287,50 +257,6 @@ function undo() {
 		game.undo()
 		render_board()
 		clear_color()
-	}
-}
-
-// debug only
-function auto_single(is_my_turn) {
-	if (game.game_over()) {
-		finish_game()
-		return
-	}
-
-	let m = mode
-	if (!is_my_turn) {
-		m = "hard"
-	}
-
-	predict (
-		m,
-		game.fen(),
-		function (res) {
-			console.log(res)
-			let move = game.move(res["action"], {sloppy: true})
-			console.log(move)
-
-			render_board()
-			clear_color()
-			let from_square_button = document.getElementById(move.from).children[0]
-			let to_square_button = document.getElementById(move.to).children[0]
-			change_color(from_square_button, color_ai)
-			change_color(to_square_button, color_ai)
-
-			auto_single(!is_my_turn)
-		},
-		function (error) {
-			alert('failed to request')
-		},
-		function () {
-		}
-	)
-}
-function auto() {
-	if (!is_predict_requested) {
-		document.getElementById("status").innerHTML = "AUTO"
-		is_predict_requested = true
-		auto_single(true)
 	}
 }
 

@@ -1,0 +1,69 @@
+{% extends "index.html" %}
+
+{% block css %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block body %}
+	<div class="d-flex justify-content-center align-items-center mt-5">
+		<div class="card">
+			<p class="text-center">your history</p>
+			<div class="list-group text-center">
+	{% for history in histories %}
+				<a href="history?id={{ history['id'] }}&view={{ history['color'] }}" class="list-group-item list-group-item-action option-color">
+		{% if history['color'] == 'black' %}
+					<span style="color: #000000">
+						{{ name }}
+					</span>
+					<span style="color: #FF0000">
+						VS
+					</span>
+					<span style="color: #FFFFFF">
+						{{ history['enemy'] }}
+					</span>
+		{% else %}
+					<span style="color: #FFFFFF">
+						{{ name }}
+					</span>
+					<span style="color: #FF0000">
+						VS
+					</span>
+					<span style="color: #000000">
+						{{ history['enemy'] }}
+					</span>
+		{% endif %}
+				</a>
+	{% endfor %}
+			</div>
+
+			<div class="d-flex justify-content-between">
+	{% if page > 1 %}
+				<button class="btn option-color" onclick="location.href='/home?page={{ page - 1 }}'">
+	{% else %}
+				<button class="btn option-color" disabled>
+	{% endif %}
+					Prev
+				</button>
+
+				<p class="text-center">{{ page }}</p>
+
+	{% if page < num_page %}
+				<button class="btn option-color" onclick="location.href='/home?page={{ page + 1 }}'">
+	{% else %}
+				<button class="btn option-color" disabled>
+	{% endif %}
+					Next
+				</button>
+			</div>
+
+			<div class="d-flex justify-content-around">
+				<div class="item"><button class="btn option-color" onclick="location.href='play'">Play Now</button></div>
+				<div class="item"><button class="btn option-color" onclick="location.href='logout'">Logout</button></div>
+			</div>
+
+			<div class="d-flex justify-content-center">
+				<a href="https://github.com/dev-jwel/JBNU-SDP"><img src="{{ url_for('static', filename='img/GitHub.png') }}"></a>
+			</div>
+		</div>
+	</div>
+{% endblock %}
